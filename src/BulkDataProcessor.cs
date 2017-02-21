@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 
-namespace ConsoleApplication
+namespace CongressCollector
 {
     public class BulkDataProcessor
     {

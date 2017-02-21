@@ -1,4 +1,4 @@
-namespace ConsoleApplication
+namespace CongressCollector
 {
     public enum BulkDataType
     {

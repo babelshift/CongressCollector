@@ -1,7 +1,8 @@
-namespace ConsoleApplication
+namespace CongressCollector
 {
     public enum BillType
     {
+        Unknown,
         SRES,
         SJRES,
         SCONRES,
