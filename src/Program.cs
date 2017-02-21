@@ -1,70 +1,129 @@
-﻿using Microsoft.Extensions.CommandLineUtils;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.CommandLineUtils;
+using System.Threading.Tasks;
 
 namespace CongressCollector
 {
     public class Program
     {
+        private const string helpOptionText = "-? | -h | --help";
+
         public static void Main(string[] args)
         {
-            // Program.exe <-g|--greeting|-$ <greeting>> [name <fullname>]
-            // [-?|-h|--help] [-u|--uppercase]
             CommandLineApplication commandLineApplication = new CommandLineApplication(throwOnUnexpectedArg: false);
             commandLineApplication.Name = "CongressCollector";
             commandLineApplication.FullName = "CongressCollector - For all your congressional data needs.";
+            commandLineApplication.HelpOption(helpOptionText);
 
-            commandLineApplication.HelpOption("-? | -h | --help");
-            var collectionOption = commandLineApplication.Option("-b | --bulkcollection <bulkcollection>", "Bulk data collection to get such as 'billstatus'.", CommandOptionType.SingleValue);
-            var congressOption = commandLineApplication.Option("-c | --congress <congress>", "Congress to retrieve data for such as '113'.", CommandOptionType.SingleValue);
-            var billTypeOption = commandLineApplication.Option("-t | --billtype <billtype>", "Bill types to retrieve such as 'hconres'.", CommandOptionType.SingleValue);
-
-            commandLineApplication.OnExecute(async () =>
+            commandLineApplication.Command("collect", config =>
             {
-                if (collectionOption.HasValue())
+                config.Description = "Initiate the process of collecting bulk data from the GPO FDsys database.";
+                config.HelpOption(helpOptionText);
+
+                var collectionArgument = config.Argument("collection", "Bulk data collection to retrieve. See 'list collections' for valid inputs.");
+                var congressOption = config.Option("-c | --congress <congress>", "Congress for which to receive data. See 'list congresses' for valid inputs.", CommandOptionType.SingleValue);
+                var measureOption = config.Option("-m | --measure <measure>", "Legislative measures to retrieve. See 'list measures' for valid inputs.", CommandOptionType.SingleValue);
+
+                config.OnExecute(() =>
                 {
-                    if (collectionOption.Value() == "billstatus")
+                    if (String.IsNullOrWhiteSpace(collectionArgument.Value))
                     {
-                        BulkDataProcessor bulkDataProcessor = new BulkDataProcessor(BulkDataType.BillStatus);
+                        Console.WriteLine("Required parameter '{0}' for command '{1}' was not provided.", collectionArgument.Name, config.Name);
+                        return 0;
+                    }
 
-                        if (congressOption.HasValue())
+                    string collectionName = collectionArgument.Value.ToLower();
+
+                    // Don't do anything if the user provided an invalid collection name
+                    if (!SupportedArgumentChecker.Instance.IsValidCollection(collectionName))
+                    {
+                        Console.WriteLine("An invalid value was supplied for parameter '{0}' and command '{1}'. See 'list collections' for valid inputs.", collectionArgument.Name, config.Name);
+                        return 0;
+                    }
+
+                    // If the user provided a congress option, try to parse and use it
+                    int? congress = null;
+                    int temp = 0;
+                    if (congressOption.HasValue())
+                    {
+                        bool success = int.TryParse(congressOption.Value(), out temp);
+                        congress = success ? (int?)temp : null;
+                        if (!success || !SupportedArgumentChecker.Instance.IsValidCongress(congress.Value))
                         {
-                            int congress = 0;
-                            bool success = int.TryParse(congressOption.Value(), out congress);
-
-                            if (!success)
-                            {
-                                return 0;
-                            }
-
-                            if (billTypeOption.HasValue())
-                            {
-                                BillType billType = BillType.Unknown;
-                                if (billTypeOption.Value() == "hconres")
-                                {
-                                    billType = BillType.HCONRES;
-                                    await bulkDataProcessor.StartAsync(congress, billType);
-                                }
-                            }
-                            else
-                            {
-                                return 0;
-                            }
-                        }
-                        else
-                        {
+                            Console.WriteLine("An invalid value was supplied for option '{0}'. See 'list congresses' for valid inputs.", congressOption.LongName);
                             return 0;
                         }
                     }
-                }
 
-                return 0;
+                    // If the user has provided a measure option, try to parse and use it
+                    string measure = String.Empty;
+                    if (measureOption.HasValue())
+                    {
+                        if (!SupportedArgumentChecker.Instance.IsValidMeasure(measureOption.Value()))
+                        {
+                            Console.WriteLine("An invalid value was supplied for option '{0}'. See 'list measures' for valid inputs.", measureOption.LongName);
+                            return 0;
+                        }
+                        measure = measureOption.Value().ToString();
+                    }
+
+                    BulkDataProcessor bulkDataProcessor = new BulkDataProcessor(collectionName);
+
+                    Task.Run(async () =>
+                    {
+                        await bulkDataProcessor.StartAsync(congress, measure);
+                    }).Wait();
+                    return 0;
+                });
             });
+
+            commandLineApplication.Command("list", config =>
+            {
+                config.Description = "List some valid inputs for commands and options.";
+                config.HelpOption(helpOptionText);
+
+                var listCongressesArgument = config.Command("congresses", argumentConfig =>
+                {
+                    argumentConfig.Description = "List all congresses that can be used in the '-c' option of the 'collect' command.";
+
+                    argumentConfig.OnExecute(() =>
+                    {
+                        PrintCommandLineArguments(SupportedArgumentChecker.Instance.Congresses);
+                        return 0;
+                    });
+                });
+                var listMeasuresArgument = config.Command("measures", argumentConfig =>
+                {
+                    argumentConfig.Description = "List all measures that can be used in the '-m' option of the 'collect' command.";
+
+                    argumentConfig.OnExecute(() =>
+                    {
+                        PrintCommandLineArguments(SupportedArgumentChecker.Instance.Measures);
+                        return 0;
+                    });
+                });
+                var listCollectionsArgument = config.Command("collections", argumentConfig =>
+                {
+                    argumentConfig.Description = "List all collections that can be used as an argument of the 'collect' command.";
+
+                    argumentConfig.OnExecute(() =>
+                    {
+                        PrintCommandLineArguments(SupportedArgumentChecker.Instance.Collections);
+                        return 0;
+                    });
+                });
+            });
+
             commandLineApplication.Execute(args);
+        }
 
-
-            // await bulkDataProcessor.StartAsync(113, BillType.HCONRES);
-            // await bulkDataProcessor.StartAsync(113, BillType.HJRES);
-            // await bulkDataProcessor.StartAsync(113, BillType.HR);
-            // await bulkDataProcessor.StartAsync(113, BillType.HRES);
+        private static void PrintCommandLineArguments<T>(IEnumerable<SupportedArgument<T>> arguments)
+        {
+            foreach (var argument in arguments)
+            {
+                Console.WriteLine(String.Format("'{0}' - {1}", argument.Value, argument.Description));
+            }
         }
     }
 }
