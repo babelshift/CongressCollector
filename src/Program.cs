@@ -99,7 +99,7 @@ namespace CongressCollector
                         {
                             Console.WriteLine("That output directory doesn't exist. Use the '-f' flag to force use it or change to a different directory.");
                         }
-                        catch (ArgumentOutOfRangeException ex)
+                        catch (Exception ex)
                         {
                             Console.WriteLine(ex.Message);
                         }
