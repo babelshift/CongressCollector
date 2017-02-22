@@ -16,9 +16,9 @@ namespace CongressCollector
     public class BulkDataProcessor
     {
         private const string bulkDataBaseUrl = "https://www.gpo.gov/fdsys/bulkdata/";
-        private readonly string outputBasePath = System.AppContext.BaseDirectory + "/";
+        private readonly string outputBasePathDefault = System.AppContext.BaseDirectory;
         private readonly string bulkDataZipBaseUrl = String.Empty;
-        private readonly string outputPath = String.Empty;
+        private string outputPathActual = String.Empty;
         private string bulkDataCollectionName = String.Empty;
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace CongressCollector
         {
             bulkDataCollectionName = collectionName.ToUpper();
             bulkDataZipBaseUrl = bulkDataBaseUrl + bulkDataCollectionName;
-            outputPath = outputBasePath + bulkDataCollectionName;
+            outputPathActual = outputBasePathDefault + "/" + bulkDataCollectionName;
         }
 
         /// <summary>
@@ -37,10 +37,11 @@ namespace CongressCollector
         /// </summary>
         /// <param name="congress">Filters the process down to a specific congress</param>
         /// <param name="measure">Filters the process down to a specific legislative measure</param>
-        public async Task StartAsync(int? congress = null, string measure = "")
+        public async Task StartAsync(int? congress = null, string measure = "", string outputPath = "", bool isForced = false)
         {
             bool isCongressProvided = congress.HasValue;
             bool isMeasureProvided = !String.IsNullOrWhiteSpace(measure);
+            bool isOutputPathProvided = !String.IsNullOrWhiteSpace(outputPath);
 
             if (isMeasureProvided && !SupportedArgumentChecker.Instance.IsValidMeasure(measure))
             {
@@ -50,6 +51,19 @@ namespace CongressCollector
             if (isCongressProvided && !SupportedArgumentChecker.Instance.IsValidCongress(congress.Value))
             {
                 throw new ArgumentOutOfRangeException("congress", String.Format("Congress '{0}' is not supported.", congress));
+            }
+
+            // If an output path was provided, check if it exists and if we are forced to create it
+            if(isOutputPathProvided)
+            {
+                // If the user input output location does not exist and did not force, then exception indicating it doesn't exist
+                if(!Directory.Exists(outputPath) && !isForced)
+                {
+                    throw new DirectoryNotFoundException(String.Format("Output directory '{0}' not found.", outputPath));
+                }   
+
+                // Override the output path with that value if all is good.
+                this.outputPathActual = outputPath + "/" + bulkDataCollectionName;
             }
 
             List<BulkDataZipUrl> bulkDataZipUrls = new List<BulkDataZipUrl>();
@@ -96,7 +110,7 @@ namespace CongressCollector
             // Collect and process the ZIP files found at the URLs determined from our parameter evaluation above
             foreach (var bulkDataZipUrl in bulkDataZipUrls)
             {
-                string outputPathWithBillType = String.Format("{0}/{1}/{2}", outputPath, bulkDataZipUrl.Congress, bulkDataZipUrl.Measure);
+                string outputPathWithBillType = String.Format("{0}/{1}/{2}", outputPathActual, bulkDataZipUrl.Congress, bulkDataZipUrl.Measure);
 
                 if (!Directory.Exists(outputPathWithBillType))
                 {

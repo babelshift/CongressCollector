@@ -26,6 +26,8 @@ namespace CongressCollector
                 var collectionArgument = collectCommandConfig.Argument("collection", "Bulk data collection to retrieve. See 'list collections' for valid inputs.");
                 var congressOption = collectCommandConfig.Option("-c | --congress <congress>", "Congress for which to receive data. See 'list congresses' for valid inputs.", CommandOptionType.SingleValue);
                 var measureOption = collectCommandConfig.Option("-m | --measure <measure>", "Legislative measures to retrieve. See 'list measures' for valid inputs.", CommandOptionType.SingleValue);
+                var outputOption = collectCommandConfig.Option("-o | --out <out>", "Path to write application output files.", CommandOptionType.SingleValue);
+                var forceOption = collectCommandConfig.Option("-f | --force", "Forces the application to output to the folder identified by the '-o' option even if it doesn't exist.", CommandOptionType.NoValue);
 
                 // Setup the logic to execute when the collect command is initiated
                 collectCommandConfig.OnExecute(() =>
@@ -75,11 +77,19 @@ namespace CongressCollector
                         measure = measureOption.Value().ToString();
                     }
 
+                    string output = String.Empty;
+                    if(outputOption.HasValue())
+                    {
+                        output = outputOption.Value().ToString();
+                    }
+
+                    bool isForced = forceOption.HasValue();
+
                     // Start bulk processing based on the user inputs
                     BulkDataProcessor bulkDataProcessor = new BulkDataProcessor(collectionName);
                     Task.Run(async () =>
                     {
-                        await bulkDataProcessor.StartAsync(congress, measure);
+                        await bulkDataProcessor.StartAsync(congress, measure, output, isForced);
                     }).Wait();
                     return 0;
                 });
