@@ -139,3 +139,14 @@ All legislative measures for the *115th Congress* in the *BILLSTATUS* collection
 All legislative measures for all congresses.
 
     dotnet CongressCollector.dll collect billstatus
+    
+### Output
+
+The application will output XML and JSON files for each retrieved legislative measure in the following folder structure:
+
+    ./COLLECTION/CONGRESS/MEASURE
+    
+Such as:
+
+    ./BILLSTATUS/113/HJRES/BILLSTATUS-113hjres1.json
+    ./BILLSTATUS/113/HJRES/BILLSTATUS-113hjres1.xml
