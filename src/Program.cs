@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.CommandLineUtils;
 using System.Threading.Tasks;
+using System.Linq;
+using System.IO;
 
 namespace CongressCollector
 {
@@ -78,7 +80,7 @@ namespace CongressCollector
                     }
 
                     string output = String.Empty;
-                    if(outputOption.HasValue())
+                    if (outputOption.HasValue())
                     {
                         output = outputOption.Value().ToString();
                     }
@@ -89,7 +91,18 @@ namespace CongressCollector
                     BulkDataProcessor bulkDataProcessor = new BulkDataProcessor(collectionName);
                     Task.Run(async () =>
                     {
-                        await bulkDataProcessor.StartAsync(congress, measure, output, isForced);
+                        try
+                        {
+                            await bulkDataProcessor.StartAsync(congress, measure, output, isForced);
+                        }
+                        catch (DirectoryNotFoundException)
+                        {
+                            Console.WriteLine("That output directory doesn't exist. Use the '-f' flag to force use it or change to a different directory.");
+                        }
+                        catch (ArgumentOutOfRangeException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
                     }).Wait();
                     return 0;
                 });
@@ -141,6 +154,11 @@ namespace CongressCollector
         /// <param name="arguments">Supported arguments with values and descriptions to print</param>
         private static void PrintCommandLineArguments<T>(IEnumerable<SupportedArgument<T>> arguments)
         {
+            if (arguments == null || !arguments.Any())
+            {
+                return;
+            }
+
             foreach (var argument in arguments)
             {
                 Console.WriteLine(String.Format("'{0}' - {1}", argument.Value, argument.Description));
