@@ -16,20 +16,24 @@ namespace CongressCollector
             commandLineApplication.FullName = "CongressCollector - For all your congressional data needs.";
             commandLineApplication.HelpOption(helpOptionText);
 
-            commandLineApplication.Command("collect", config =>
+            // Setup the 'collect' command to initiate bulk processing based on user options
+            commandLineApplication.Command("collect", collectCommandConfig =>
             {
-                config.Description = "Initiate the process of collecting bulk data from the GPO FDsys database.";
-                config.HelpOption(helpOptionText);
+                collectCommandConfig.Description = "Initiate the process of collecting bulk data from the GPO FDsys database.";
+                collectCommandConfig.HelpOption(helpOptionText);
 
-                var collectionArgument = config.Argument("collection", "Bulk data collection to retrieve. See 'list collections' for valid inputs.");
-                var congressOption = config.Option("-c | --congress <congress>", "Congress for which to receive data. See 'list congresses' for valid inputs.", CommandOptionType.SingleValue);
-                var measureOption = config.Option("-m | --measure <measure>", "Legislative measures to retrieve. See 'list measures' for valid inputs.", CommandOptionType.SingleValue);
+                // The collect command requires a collection argument and has two optional parameters to specify congress and measures to retrieve
+                var collectionArgument = collectCommandConfig.Argument("collection", "Bulk data collection to retrieve. See 'list collections' for valid inputs.");
+                var congressOption = collectCommandConfig.Option("-c | --congress <congress>", "Congress for which to receive data. See 'list congresses' for valid inputs.", CommandOptionType.SingleValue);
+                var measureOption = collectCommandConfig.Option("-m | --measure <measure>", "Legislative measures to retrieve. See 'list measures' for valid inputs.", CommandOptionType.SingleValue);
 
-                config.OnExecute(() =>
+                // Setup the logic to execute when the collect command is initiated
+                collectCommandConfig.OnExecute(() =>
                 {
+                    // The collection argument is a required input for the collect command
                     if (String.IsNullOrWhiteSpace(collectionArgument.Value))
                     {
-                        Console.WriteLine("Required parameter '{0}' for command '{1}' was not provided.", collectionArgument.Name, config.Name);
+                        Console.WriteLine("Required parameter '{0}' for command '{1}' was not provided.", collectionArgument.Name, collectCommandConfig.Name);
                         return 0;
                     }
 
@@ -38,7 +42,7 @@ namespace CongressCollector
                     // Don't do anything if the user provided an invalid collection name
                     if (!SupportedArgumentChecker.Instance.IsValidCollection(collectionName))
                     {
-                        Console.WriteLine("An invalid value was supplied for parameter '{0}' and command '{1}'. See 'list collections' for valid inputs.", collectionArgument.Name, config.Name);
+                        Console.WriteLine("An invalid value was supplied for parameter '{0}' and command '{1}'. See 'list collections' for valid inputs.", collectionArgument.Name, collectCommandConfig.Name);
                         return 0;
                     }
 
@@ -49,6 +53,8 @@ namespace CongressCollector
                     {
                         bool success = int.TryParse(congressOption.Value(), out temp);
                         congress = success ? (int?)temp : null;
+
+                        // Don't do anything if the user provided an invalid congress option
                         if (!success || !SupportedArgumentChecker.Instance.IsValidCongress(congress.Value))
                         {
                             Console.WriteLine("An invalid value was supplied for option '{0}'. See 'list congresses' for valid inputs.", congressOption.LongName);
@@ -60,6 +66,7 @@ namespace CongressCollector
                     string measure = String.Empty;
                     if (measureOption.HasValue())
                     {
+                        // Don't do anything if the user provided an invalid measure option
                         if (!SupportedArgumentChecker.Instance.IsValidMeasure(measureOption.Value()))
                         {
                             Console.WriteLine("An invalid value was supplied for option '{0}'. See 'list measures' for valid inputs.", measureOption.LongName);
@@ -68,8 +75,8 @@ namespace CongressCollector
                         measure = measureOption.Value().ToString();
                     }
 
+                    // Start bulk processing based on the user inputs
                     BulkDataProcessor bulkDataProcessor = new BulkDataProcessor(collectionName);
-
                     Task.Run(async () =>
                     {
                         await bulkDataProcessor.StartAsync(congress, measure);
@@ -118,6 +125,10 @@ namespace CongressCollector
             commandLineApplication.Execute(args);
         }
 
+        /// <summary>
+        /// Prints each supported argument in the passed argument list to the console
+        /// </summary>
+        /// <param name="arguments">Supported arguments with values and descriptions to print</param>
         private static void PrintCommandLineArguments<T>(IEnumerable<SupportedArgument<T>> arguments)
         {
             foreach (var argument in arguments)

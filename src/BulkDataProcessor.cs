@@ -10,6 +10,9 @@ using Newtonsoft.Json;
 
 namespace CongressCollector
 {
+    /// <summary>
+    /// Provides methods to perform bulk data collection and processing from the GPO FDsys system.
+    /// </summary>
     public class BulkDataProcessor
     {
         private const string bulkDataBaseUrl = "https://www.gpo.gov/fdsys/bulkdata/";
@@ -18,6 +21,10 @@ namespace CongressCollector
         private readonly string outputPath = String.Empty;
         private string bulkDataCollectionName = String.Empty;
 
+        /// <summary>
+        /// Default constructor creates a bulk data processor for a specific collection.
+        /// </summary>
+        /// <param name="collectionName">Collection to bulk process such as bill statuses or bill summaries</param>
         public BulkDataProcessor(string collectionName)
         {
             bulkDataCollectionName = collectionName.ToUpper();
@@ -25,6 +32,11 @@ namespace CongressCollector
             outputPath = outputBasePath + bulkDataCollectionName;
         }
 
+        /// <summary>
+        /// Begins collecting and processing bulk data based on this instance's collection and the optional congress and measure parameters.
+        /// </summary>
+        /// <param name="congress">Filters the process down to a specific congress</param>
+        /// <param name="measure">Filters the process down to a specific legislative measure</param>
         public async Task StartAsync(int? congress = null, string measure = "")
         {
             bool isCongressProvided = congress.HasValue;
@@ -32,7 +44,7 @@ namespace CongressCollector
 
             if (isMeasureProvided && !SupportedArgumentChecker.Instance.IsValidMeasure(measure))
             {
-                throw new ArgumentOutOfRangeException("congress", String.Format("Measure '{0}' is not supported.", measure));
+                throw new ArgumentOutOfRangeException("measure", String.Format("Measure '{0}' is not supported.", measure));
             }
 
             if (isCongressProvided && !SupportedArgumentChecker.Instance.IsValidCongress(congress.Value))
@@ -42,7 +54,7 @@ namespace CongressCollector
 
             List<BulkDataZipUrl> bulkDataZipUrls = new List<BulkDataZipUrl>();
 
-            // nothing was provided
+            // No options were provided, so we need to loop over all congresses and measures
             if (!isCongressProvided && !isMeasureProvided)
             {
                 foreach (var congressNumber in SupportedArgumentChecker.Instance.Congresses)
@@ -54,13 +66,13 @@ namespace CongressCollector
                     }
                 }
             }
-            // both congress and measures were provided
+            // Both congress and measure options were provided, so we only want to get specific congress and measure files
             else if (isCongressProvided && isMeasureProvided)
             {
                 var bulkDataZipUrl = GetBulkDataZipUrl(congress.Value, measure);
                 bulkDataZipUrls.Add(bulkDataZipUrl);
             }
-            // only congress was provided, so loop over measures to get all of them
+            // Only the congress option was provided, so loop over all measures related to a specific congress
             else if (isCongressProvided && !isMeasureProvided)
             {
                 foreach (var measureType in SupportedArgumentChecker.Instance.Measures)
@@ -69,7 +81,7 @@ namespace CongressCollector
                     bulkDataZipUrls.Add(bulkDataZipUrl);
                 }
             }
-            // only measure was provided so loop over congresses to get all of them
+            // Only the measure option was provided, so loop over all congresses related to a specific legislative measure
             else if (!isCongressProvided && isMeasureProvided)
             {
                 foreach (var congressNumber in SupportedArgumentChecker.Instance.Congresses)
@@ -81,6 +93,7 @@ namespace CongressCollector
 
             HttpClient httpClient = new HttpClient();
 
+            // Collect and process the ZIP files found at the URLs determined from our parameter evaluation above
             foreach (var bulkDataZipUrl in bulkDataZipUrls)
             {
                 string outputPathWithBillType = String.Format("{0}/{1}/{2}", outputPath, bulkDataZipUrl.Congress, bulkDataZipUrl.Measure);
@@ -90,12 +103,13 @@ namespace CongressCollector
                     Directory.CreateDirectory(outputPathWithBillType);
                 }
 
-                using (var zipStream = await httpClient.GetStreamAsync(bulkDataZipUrl.ZipUrl))
+                using (var zipStream = await httpClient.GetStreamAsync(bulkDataZipUrl.ToString()))
                 {
                     using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
                     {
                         foreach (var entry in archive.Entries)
                         {
+                            // Open the currently processed XML file, serialize it to a XML string, and then write to a file output
                             using (Stream entryStream = entry.Open())
                             {
                                 using (MemoryStream entryMemoryStream = new MemoryStream())
@@ -106,6 +120,8 @@ namespace CongressCollector
                                     File.WriteAllText(outputXmlPath, xml);
                                 }
                             }
+
+                            // Open the currently processed XML file, serialize it to a JSON string, and then write to a file output
                             using (Stream entryStream = entry.Open())
                             {
                                 var xDocument = XDocument.Load(entryStream);
@@ -120,10 +136,15 @@ namespace CongressCollector
             }
         }
 
+        /// <summary>
+        ///  Returns a URL to a ZIP file contained in the GPO FDsys system based on this instance's collection and the passed congress and measure parameters
+        /// </summary>
+        /// <param name="congress">Indicates the congress related to the ZIP file</param>
+        /// <param name="measure">Indicates the legislative measure type related to the ZIP file</param>
+        /// <returns>URL to ZIP file containing XML files in GPO FDsys</returns>
         private BulkDataZipUrl GetBulkDataZipUrl(int congress, string measure)
         {
-            string zipUrl = bulkDataZipBaseUrl + String.Format("/{0}/{1}/{2}-{0}-{1}.zip", congress, measure, bulkDataCollectionName);
-            return new BulkDataZipUrl(congress, measure, zipUrl);
+            return new BulkDataZipUrl(congress, measure, bulkDataZipBaseUrl, bulkDataCollectionName);
         }
     }
 }
