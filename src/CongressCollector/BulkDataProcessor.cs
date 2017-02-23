@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using CongressCollector.Models;
 using Newtonsoft.Json;
 
 namespace CongressCollector
@@ -54,15 +55,15 @@ namespace CongressCollector
             }
 
             // If an output path was provided, check if it exists and if we are forced to create it
-            if(isOutputPathProvided)
+            if (isOutputPathProvided)
             {
                 // If the user input output location does not exist and did not force, then exception indicating it doesn't exist
-                if(!Directory.Exists(outputPath) && !isForced)
+                if (!Directory.Exists(outputPath) && !isForced)
                 {
                     throw new DirectoryNotFoundException(String.Format("Output directory '{0}' not found.", outputPath));
-                }   
+                }
 
-                // Override the output path with that value if all is good.
+                // Override the output path with that value if all is good
                 this.outputPathActual = outputPath + "/" + bulkDataCollectionName;
             }
 
@@ -117,36 +118,44 @@ namespace CongressCollector
                     Directory.CreateDirectory(outputPathWithBillType);
                 }
 
-                using (var zipStream = await httpClient.GetStreamAsync(bulkDataZipUrl.ToString()))
+                // using (var zipStream = await httpClient.GetStreamAsync(bulkDataZipUrl.ToString()))
+                // {
+                // using (var zipStream = File.Open(@"C:\Users\justin\Desktop\BILLSTATUS-114-hr.zip", FileMode.Open))
+                // {
+                //     using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+                //     {
+                //         foreach (var entry in archive.Entries)
+                //         {
+                //             // Open the currently processed XML file, serialize it to a XML string, and then write to a file output
+                //             using (Stream entryStream = entry.Open())
+                //             {
+                using (Stream entryStream = File.Open(@"C:\Users\justin\Desktop\BILLSTATUS-114-hr\BILLSTATUS-114hr10.xml", FileMode.Open))
                 {
-                    using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+                    using (MemoryStream entryMemoryStream = new MemoryStream())
                     {
-                        foreach (var entry in archive.Entries)
-                        {
-                            // Open the currently processed XML file, serialize it to a XML string, and then write to a file output
-                            using (Stream entryStream = entry.Open())
-                            {
-                                using (MemoryStream entryMemoryStream = new MemoryStream())
-                                {
-                                    entryStream.CopyTo(entryMemoryStream);
-                                    string xml = Encoding.UTF8.GetString(entryMemoryStream.ToArray());
-                                    string outputXmlPath = Path.Combine(outputPathWithBillType, entry.Name);
-                                    File.WriteAllText(outputXmlPath, xml);
-                                }
-                            }
-
-                            // Open the currently processed XML file, serialize it to a JSON string, and then write to a file output
-                            using (Stream entryStream = entry.Open())
-                            {
-                                var xDocument = XDocument.Load(entryStream);
-                                string json = JsonConvert.SerializeXNode(xDocument);
-                                string jsonFileName = Path.GetFileNameWithoutExtension(entry.Name) + ".json";
-                                string output = Path.Combine(outputPathWithBillType, jsonFileName);
-                                File.WriteAllText(output, json);
-                            }
-                        }
+                        entryStream.CopyTo(entryMemoryStream);
+                        byte[] entryMemoryStreamBytes = entryMemoryStream.ToArray();
+                        string xml = Encoding.UTF8.GetString(entryMemoryStreamBytes);
+                        var testXml = XmlHelper.DeserializeXML<Models.Original.BillStatus>(entryMemoryStreamBytes);
+                        var testMap = AutoMapperConfiguration.Mapper.Map<Models.Original.Bill, Models.Cleaned.Bill>(testXml.Bill);
+                        string outputXmlPath = Path.Combine(outputPathWithBillType, "test.xml");
+                        //string outputXmlPath = Path.Combine(outputPathWithBillType, entry.Name);
+                        File.WriteAllText(outputXmlPath, xml);
                     }
                 }
+
+                // Open the currently processed XML file, serialize it to a JSON string, and then write to a file output
+                // using (Stream entryStream = entry.Open())
+                // {
+                //     var xDocument = XDocument.Load(entryStream);
+                //     string json = JsonConvert.SerializeXNode(xDocument);
+                //     string jsonFileName = Path.GetFileNameWithoutExtension(entry.Name) + ".json";
+                //     string output = Path.Combine(outputPathWithBillType, jsonFileName);
+                //     File.WriteAllText(output, json);
+                // }
+                //     }
+                // }
+                // }
             }
         }
 

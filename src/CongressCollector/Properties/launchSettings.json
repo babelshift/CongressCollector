@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CongressCollector": {
+      "commandName": "Project",
+      "commandLineArgs": "collect billstatus -c 114 -m hr"
+    }
+  }
+}

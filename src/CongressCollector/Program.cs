@@ -4,6 +4,7 @@ using Microsoft.Extensions.CommandLineUtils;
 using System.Threading.Tasks;
 using System.Linq;
 using System.IO;
+using CongressCollector.Models;
 
 namespace CongressCollector
 {
@@ -91,6 +92,8 @@ namespace CongressCollector
                     BulkDataProcessor bulkDataProcessor = new BulkDataProcessor(collectionName);
                     Task.Run(async () =>
                     {
+                        AutoMapperConfiguration.Initialize();
+
                         try
                         {
                             await bulkDataProcessor.StartAsync(congress, measure, output, isForced);
