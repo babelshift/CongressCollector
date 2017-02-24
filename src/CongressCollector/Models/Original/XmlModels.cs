@@ -31,6 +31,8 @@ namespace CongressCollector.Models.Original
     [XmlRoot(ElementName = "item")]
     public class Item
     {
+        [XmlElement(ElementName = "calendar")]
+        public string Calendar { get; set; }
         [XmlElement(ElementName = "sourceSystem")]
         public SourceSystem SourceSystem { get; set; }
         [XmlElement(ElementName = "text")]
@@ -115,6 +117,8 @@ namespace CongressCollector.Models.Original
         public string ChamberCode { get; set; }
         [XmlElement(ElementName = "chamberName")]
         public string ChamberName { get; set; }
+        [XmlElement(ElementName = "date")]
+        public string Date { get; set; }
     }
 
     [XmlRoot(ElementName = "committee")]
@@ -229,7 +233,7 @@ namespace CongressCollector.Models.Original
         [XmlElement(ElementName = "currentCount")]
         public string CurrentCount { get; set; }
         [XmlElement(ElementName = "item")]
-        public List<Item> Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "sponsors")]
@@ -370,7 +374,7 @@ namespace CongressCollector.Models.Original
     public class CboCostEstimates
     {
         [XmlElement(ElementName = "item")]
-        public Item Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "laws")]
@@ -425,21 +429,21 @@ namespace CongressCollector.Models.Original
     public class Activities
     {
         [XmlElement(ElementName = "item")]
-        public Item Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "subcommittees")]
     public class Subcommittees
     {
         [XmlElement(ElementName = "item")]
-        public Item Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "billCommittees")]
     public class BillCommittees
     {
         [XmlElement(ElementName = "item")]
-        public List<Item> Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "committees")]
@@ -493,7 +497,7 @@ namespace CongressCollector.Models.Original
     public class BillSummaries
     {
         [XmlElement(ElementName = "item")]
-        public List<Item> Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "summaries")]
@@ -581,11 +585,12 @@ namespace CongressCollector.Models.Original
         public List<Item> Items { get; set; }
     }
 
+
     [XmlRoot(ElementName = "calendarNumbers")]
     public class CalendarNumber
     {
-        public string Number { get; set; }
-        public string Calendar { get; set; }
+        [XmlElement(ElementName = "item")]
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "dublinCore")]

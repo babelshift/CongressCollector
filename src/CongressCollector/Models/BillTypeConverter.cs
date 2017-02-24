@@ -4,6 +4,7 @@ using AutoMapper;
 using System.Linq;
 using CongressCollector.Models.Cleaned;
 using CongressCollector.Models.Original;
+using CongressCollector.Models.Utilities;
 
 namespace CongressCollector.Models
 {
@@ -19,16 +20,161 @@ namespace CongressCollector.Models
             bill.ConstitutionalAuthorityStatement = source.ConstitutionalAuthorityStatementText;
             bill.BillType = source.BillType;
             bill.OriginChamber = source.OriginChamber;
-            bill.UpdateDate = ParseNullableDateTime(source.UpdateDate);
-            bill.IntroducedDate = ParseNullableDateTime(source.IntroducedDate);
-            bill.CreateDate = ParseNullableDateTime(source.CreateDate);
-            bill.Actions = GetBillActions(source.Actions);
-            bill.Amendments = GetBillAmendments(source.Amendments);
+            bill.UpdateDate = ParseHelpers.ParseNullableDateTime(source.UpdateDate);
+            bill.IntroducedDate = ParseHelpers.ParseNullableDateTime(source.IntroducedDate);
+            bill.CreateDate = ParseHelpers.ParseNullableDateTime(source.CreateDate);
+            bill.Actions = GetBillActions(context, source.Actions);
+            bill.Amendments = GetBillAmendments(context, source.Amendments);
+            bill.BillSummaries = GetBillSummaries(source.Summaries);
+            bill.CalendarNumbers = GetCalendarNumbers(context, source.CalendarNumbers);
+            bill.CBOCostEstimates = GetCBOCostEstimates(source.CboCostEstimates);
+            bill.CommitteeReports = GetCommitteeReports(context, source.CommitteeReports);
+            bill.Committees = GetCommittees(context, source.Committees);
 
             return bill;
         }
 
-        private IReadOnlyCollection<Cleaned.BillAmendment> GetBillAmendments(Original.Amendments amendments)
+        private IReadOnlyCollection<Cleaned.Committee> GetCommittees(ResolutionContext context, Committees committees)
+        {
+            List<Cleaned.Committee> billCommittees = new List<Cleaned.Committee>();
+
+            if (committees != null && committees.BillCommittees != null && committees.BillCommittees.Items != null)
+            {
+                foreach (var committee in committees.BillCommittees.Items)
+                {
+                    Cleaned.Committee billCommittee = new Cleaned.Committee()
+                    {
+                        Name = committee.Name,
+                        Chamber = committee.Chamber,
+                        SystemCode = committee.SystemCode,
+                        Type = committee.Type,
+                        Activities = GetCommitteeActivities(context, committee.Activities),
+                        Subcommittees = GetSubcommittees(context, committee.Subcommittees)
+                    };
+                }
+            }
+
+            return billCommittees.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<Cleaned.Subcommittee> GetSubcommittees(ResolutionContext context, Original.Subcommittees subcommittees)
+        {
+            List<Cleaned.Subcommittee> billSubcommittees = new List<Cleaned.Subcommittee>();
+
+            if (subcommittees != null && subcommittees.Items != null)
+            {
+                foreach (var subcommittee in subcommittees.Items)
+                {
+                    Cleaned.Subcommittee billSubcommittee = new Subcommittee()
+                    {
+                        Name = subcommittee.Name,
+                        SystemCode = subcommittee.SystemCode,
+                        Activities = GetSubcommitteeActivities(context, subcommittee.Activities)
+                    };
+                    billSubcommittees.Add(billSubcommittee);
+                }
+            }
+
+            return billSubcommittees.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<SubcommitteeActivity> GetSubcommitteeActivities(ResolutionContext context, Activities activities)
+        {
+            List<Cleaned.SubcommitteeActivity> subcommitteeActivities = new List<Cleaned.SubcommitteeActivity>();
+
+            if (activities != null && activities.Items != null)
+            {
+                subcommitteeActivities = context.Mapper.Map<List<Original.Item>, List<Cleaned.SubcommitteeActivity>>(activities.Items);
+            }
+
+            return subcommitteeActivities.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<Cleaned.CommitteeActivity> GetCommitteeActivities(ResolutionContext context, Original.Activities activities)
+        {
+            List<Cleaned.CommitteeActivity> billCommitteeActivities = new List<Cleaned.CommitteeActivity>();
+
+            if (activities != null && activities.Items != null)
+            {
+                billCommitteeActivities = context.Mapper.Map<List<Original.Item>, List<Cleaned.CommitteeActivity>>(activities.Items);
+            }
+
+            return billCommitteeActivities.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<Cleaned.CommitteeReport> GetCommitteeReports(ResolutionContext context, Original.CommitteeReports committeeReports)
+        {
+            List<Cleaned.CommitteeReport> billCommitteeReports = new List<Cleaned.CommitteeReport>();
+
+            if (committeeReports != null && committeeReports.InnerCommitteeReports != null)
+            {
+                billCommitteeReports = context.Mapper.Map<List<Original.CommitteeReport>, List<Cleaned.CommitteeReport>>(committeeReports.InnerCommitteeReports);
+            }
+
+            return billCommitteeReports.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<CBOCostEstimate> GetCBOCostEstimates(Original.CboCostEstimates cboCostEstimates)
+        {
+            List<Cleaned.CBOCostEstimate> billCboCostEstimates = new List<Cleaned.CBOCostEstimate>();
+
+            if (cboCostEstimates != null && cboCostEstimates.Items != null)
+            {
+                foreach (var cboCostEstimate in cboCostEstimates.Items)
+                {
+                    Cleaned.CBOCostEstimate billCboCostEstimate = new Cleaned.CBOCostEstimate()
+                    {
+                        Title = cboCostEstimate.Title,
+                        PublishedDate = ParseHelpers.ParseNullableDateTime(cboCostEstimate.PubDate),
+                        URL = new Uri(cboCostEstimate.Url) // validate url first?
+                    };
+
+                    billCboCostEstimates.Add(billCboCostEstimate);
+                }
+            }
+
+            return billCboCostEstimates.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<Cleaned.CalendarNumber> GetCalendarNumbers(ResolutionContext context, Original.CalendarNumber calendarNumbers)
+        {
+            List<Cleaned.CalendarNumber> billCalendarNumbers = new List<Cleaned.CalendarNumber>();
+
+            if (calendarNumbers != null && calendarNumbers.Items != null)
+            {
+                billCalendarNumbers = context.Mapper.Map<List<Original.Item>, List<Cleaned.CalendarNumber>>(calendarNumbers.Items);
+            }
+
+            return billCalendarNumbers.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<BillSummary> GetBillSummaries(Original.Summaries summaries)
+        {
+            List<Cleaned.BillSummary> billSummaries = new List<Cleaned.BillSummary>();
+
+            if (summaries != null && summaries.BillSummaries != null && summaries.BillSummaries.Items != null)
+            {
+                foreach (var summary in summaries.BillSummaries.Items)
+                {
+                    Cleaned.BillSummary billSummary = new BillSummary()
+                    {
+                        ActionDate = ParseHelpers.ParseNullableDateTime(summary.ActionDate),
+                        UpdateDate = ParseHelpers.ParseNullableDateTime(summary.UpdateDate),
+                        LastSummaryUpdateDate = ParseHelpers.ParseNullableDateTime(summary.LastSummaryUpdateDate),
+                        ActionDescription = summary.ActionDesc,
+                        Name = summary.Name,
+                        Text = summary.Text,
+                        VersionCode = summary.VersionCode
+                    };
+
+                    billSummaries.Add(billSummary);
+                }
+            }
+
+            return billSummaries.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<Cleaned.BillAmendment> GetBillAmendments(ResolutionContext context, Original.Amendments amendments)
         {
             List<Cleaned.BillAmendment> billAmendments = new List<Cleaned.BillAmendment>();
 
@@ -39,18 +185,22 @@ namespace CongressCollector.Models
                     Cleaned.BillAmendment billAmendment = new Cleaned.BillAmendment()
                     {
                         Chamber = amendment.Chamber,
-                        Congress = GetFirstStringOrEmpty(amendment.Congress),
-                        CreateDate = ParseNullableDateTime(amendment.CreateDate),
-                        ProposedDate = ParseNullableDateTime(amendment.ProposedDate),
-                        SubmittedDate = ParseNullableDateTime(amendment.SubmittedDate),
-                        UpdateDate = ParseNullableDateTime(amendment.UpdateDate),
-                        Number = GetFirstStringOrEmpty(amendment.Number),
-                        Purpose = GetFirstStringOrEmpty(amendment.Purpose),
-                        Description = GetFirstStringOrEmpty(amendment.Description)
+                        Congress = ParseHelpers.GetFirstStringOrEmpty(amendment.Congress),
+                        CreateDate = ParseHelpers.ParseNullableDateTime(amendment.CreateDate),
+                        ProposedDate = ParseHelpers.ParseNullableDateTime(amendment.ProposedDate),
+                        SubmittedDate = ParseHelpers.ParseNullableDateTime(amendment.SubmittedDate),
+                        UpdateDate = ParseHelpers.ParseNullableDateTime(amendment.UpdateDate),
+                        Number = ParseHelpers.GetFirstStringOrEmpty(amendment.Number),
+                        Purpose = ParseHelpers.GetFirstStringOrEmpty(amendment.Purpose),
+                        Description = ParseHelpers.GetFirstStringOrEmpty(amendment.Description),
+                        AmendmentType = ParseHelpers.GetFirstStringOrEmpty(amendment.Type)
                     };
 
-                    billAmendment.Actions = GetBillAmentmentActions(amendment);
-                    billAmendment.AmendedAmendment = GetAmendedAmendment(amendment.AmendedAmendment);
+                    billAmendment.Actions = GetBillAmentmentActions(context, amendment.Actions);
+                    billAmendment.AmendedAmendment = context.Mapper.Map<Original.AmendedAmendment, Cleaned.AmendedAmendment>(amendment.AmendedAmendment);
+                    billAmendment.AmendedBill = context.Mapper.Map<Original.AmendedBill, Cleaned.AmendedBill>(amendment.AmendedBill);
+                    billAmendment.Cosponsors = context.Mapper.Map<Original.Cosponsors, Cleaned.BillAmendmentCosponsor>(amendment.Cosponsors);
+                    //billAmendment.LatestAction = 
 
                     billAmendments.Add(billAmendment);
                 }
@@ -59,135 +209,29 @@ namespace CongressCollector.Models
             return billAmendments.AsReadOnly();
         }
 
-        private Cleaned.AmendedAmendment GetAmendedAmendment(Original.AmendedAmendment amendedAmendment)
-        {
-            return amendedAmendment != null ? new Cleaned.AmendedAmendment()
-            {
-                Congress = amendedAmendment.Congress,
-                Description = amendedAmendment.Description,
-                Number = amendedAmendment.Number,
-                Purpose = amendedAmendment.Purpose,
-                Type = amendedAmendment.Type
-            } : null;
-        }
-
-        private List<Cleaned.BillAmendmentAction> GetBillAmentmentActions(Original.Amendment amendment)
+        private IReadOnlyCollection<Cleaned.BillAmendmentAction> GetBillAmentmentActions(ResolutionContext context, Original.Actions actions)
         {
             List<Cleaned.BillAmendmentAction> billAmendmentActions = new List<Cleaned.BillAmendmentAction>();
-            foreach (var action in amendment.Actions.Items)
+
+            if (actions != null && actions.Items != null)
             {
-                Cleaned.BillAmendmentAction billAmendmentAction = new Cleaned.BillAmendmentAction()
-                {
-                    ActionCode = action.ActionCode,
-                    ActionType = action.Type,
-                    Text = action.Text,
-                    ActionDate = ParseNullableDateTime(action.ActionDate, action.ActionTime),
-                    SourceSystem = GetItemSourceSystem(action.SourceSystem),
-                    Links = GetItemLinks(action.Links)
-                };
-                billAmendmentActions.Add(billAmendmentAction);
+                billAmendmentActions = context.Mapper.Map<List<Original.Item>, List<Cleaned.BillAmendmentAction>>(actions.Items);
             }
 
-            return billAmendmentActions;
+            return billAmendmentActions.AsReadOnly();
         }
 
-        private static Cleaned.SourceSystem GetItemSourceSystem(Original.SourceSystem sourceSystem)
-        {
-            return sourceSystem != null ? new Cleaned.SourceSystem()
-            {
-                Code = sourceSystem.Code,
-                Name = sourceSystem.Name
-            } : null;
-        }
 
-        private static System.Collections.ObjectModel.ReadOnlyCollection<Cleaned.Link> GetItemLinks(Original.Links links)
-        {
-            return (links != null && links.Link != null)
-            ? links.Link.Select(x => new Cleaned.Link()
-            {
-                Name = x.Name,
-                URL = new Uri(x.Url) // might need to input validation/trycreate this
-            }).ToList().AsReadOnly() : null;
-        }
-
-        private string GetFirstStringOrEmpty(IList<string> items)
-        {
-            return items != null && items.Count > 0 ? items[0] : String.Empty;
-        }
-
-        private IReadOnlyCollection<Cleaned.BillAction> GetBillActions(Original.Actions actions)
+        private IReadOnlyCollection<Cleaned.BillAction> GetBillActions(ResolutionContext context, Original.Actions actions)
         {
             List<Cleaned.BillAction> billActions = new List<Cleaned.BillAction>();
-            if (actions != null)
+
+            if (actions != null && actions.Items != null)
             {
-                foreach (var action in actions.Items)
-                {
-                    Cleaned.BillAction billAction = new Cleaned.BillAction()
-                    {
-                        Text = action.Text,
-                        Type = action.Type,
-                        Code = action.ActionCode,
-                        DateTime = ParseNullableDateTime(action.ActionDate, action.ActionTime),
-                        Committee = GetBillActionCommittee(action.Committee),
-                        SourceSystem = GetItemSourceSystem(action.SourceSystem),
-                        Links = GetItemLinks(action.Links)
-                    };
-
-                    billAction.Text = action.Text;
-                    billAction.Type = action.Type;
-                    billAction.Code = action.ActionCode;
-                    billAction.DateTime = ParseNullableDateTime(action.ActionDate, action.ActionTime);
-                    billAction.Committee = GetBillActionCommittee(action.Committee);
-                    billAction.SourceSystem = GetItemSourceSystem(action.SourceSystem);
-                    billAction.Links = GetItemLinks(action.Links);
-
-                    billActions.Add(billAction);
-                }
+                billActions = context.Mapper.Map<List<Original.Item>, List<Cleaned.BillAction>>(actions.Items);
             }
+
             return billActions.AsReadOnly();
-        }
-
-        private BillActionCommittee GetBillActionCommittee(Original.Committee committee)
-        {
-            return committee != null ? new BillActionCommittee()
-            {
-                Name = committee.Name,
-                SystemCode = committee.SystemCode
-            } : null;
-        }
-
-        private DateTime? ParseNullableDateTime(string date, string time)
-        {
-            if (String.IsNullOrWhiteSpace(date)) { return null; }
-
-            if (time == null) { time = String.Empty; }
-
-            string rawDateTime = String.Format("{0} {1}", date.Trim(), time.Trim());
-
-            DateTime dateTime;
-            if (DateTime.TryParse(rawDateTime, out dateTime))
-            {
-                return dateTime;
-            }
-
-            return null;
-        }
-
-        private DateTime? ParseNullableDateTime(string dateTime)
-        {
-            if (String.IsNullOrWhiteSpace(dateTime))
-            {
-                return null;
-            }
-
-            DateTime updateDate;
-
-            if (DateTime.TryParse(dateTime, out updateDate))
-            {
-                return (DateTime?)updateDate;
-            }
-
-            return null;
         }
     }
 }

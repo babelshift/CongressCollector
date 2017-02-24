@@ -56,12 +56,12 @@ namespace CongressCollector.Models.Cleaned
 
     public class BillSummary
     {
-        public DateTime ActionDate { get; set; }
+        public DateTime? ActionDate { get; set; }
         public string ActionDescription { get; set; }
         public string Text { get; set; }
-        public DateTime LastSummaryUpdateDate { get; set; }
+        public DateTime? LastSummaryUpdateDate { get; set; }
         public string Name { get; set; }
-        public DateTime UpdateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
         public string VersionCode { get; set; }
     }
 
@@ -134,15 +134,17 @@ namespace CongressCollector.Models.Cleaned
 
     public class SubcommitteeActivity
     {
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
         public string Name { get; set; }
     }
 
     public class CommitteeActivity
     {
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
         public string Name { get; set; }
-        public IReadOnlyCollection<CommitteeActivityReport> Reports { get; set; }
+
+        // what is this?
+        //public IReadOnlyCollection<CommitteeActivityReport> Reports { get; set; }
     }
 
     public class CommitteeActivityReport
@@ -192,10 +194,10 @@ namespace CongressCollector.Models.Cleaned
         public SourceSystem SourceSystem { get; set; }
         public BillActionCommittee Committee { get; set; }
         public string Text { get; set; }
-        public DateTime? DateTime { get; set; } // TODO: combine Time+Date
+        public DateTime? ActionDate { get; set; } // TODO: combine Time+Date
         public string Type { get; set; }
         public IReadOnlyCollection<Link> Links { get; set; }
-        public string Code { get; set; }
+        public string ActionCode { get; set; }
     }
 
     public class BillActionCommittee
@@ -223,7 +225,7 @@ namespace CongressCollector.Models.Cleaned
         public string Congress { get; set; }
         public string Number { get; set; }
         public IReadOnlyCollection<BillTitle> Titles { get; set; }
-        public IReadOnlyCollection<BillAmendmentCosponsor> Cosponsors { get; set; }
+        public BillAmendmentCosponsor Cosponsors { get; set; }
         public IReadOnlyCollection<BillAmendmentSponsor> Sponsors { get; set; }
         public string Purpose { get; set; }
         public string Chamber { get; set; }
@@ -261,7 +263,7 @@ namespace CongressCollector.Models.Cleaned
 
     public class CBOCostEstimate
     {
-        public DateTime PubDate { get; set; }
+        public DateTime? PublishedDate { get; set; }
         public Uri URL { get; set; }
         public string Title { get; set; }
     }
@@ -272,7 +274,7 @@ namespace CongressCollector.Models.Cleaned
         public string Text { get; set; }
         public string ActionCode { get; set; }
         public SourceSystem SourceSystem { get; set; }
-        public string ActionType { get; set; }
+        public string Type { get; set; }
         public IReadOnlyCollection<Link> Links { get; set; }
     }
 
@@ -296,8 +298,8 @@ namespace CongressCollector.Models.Cleaned
 
     public class AmendedBill
     {
-        public int Congress { get; set; }
-        public int Number { get; set; }
+        public string Congress { get; set; }
+        public string Number { get; set; }
         public string OriginChamber { get; set; }
         public string OriginChamberCode { get; set; }
         public string Title { get; set; }
