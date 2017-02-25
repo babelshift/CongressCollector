@@ -196,11 +196,15 @@ namespace CongressCollector.Models
                         AmendmentType = ParseHelpers.GetFirstStringOrEmpty(amendment.Type)
                     };
 
-                    billAmendment.Actions = GetBillAmentmentActions(context, amendment.Actions);
+                    billAmendment.Actions = context.Mapper.Map<Original.Actions, IReadOnlyCollection<Cleaned.BillAmendmentAction>>(amendment.Actions);
                     billAmendment.AmendedAmendment = context.Mapper.Map<Original.AmendedAmendment, Cleaned.AmendedAmendment>(amendment.AmendedAmendment);
                     billAmendment.AmendedBill = context.Mapper.Map<Original.AmendedBill, Cleaned.AmendedBill>(amendment.AmendedBill);
                     billAmendment.Cosponsors = context.Mapper.Map<Original.Cosponsors, Cleaned.BillAmendmentCosponsor>(amendment.Cosponsors);
-                    //billAmendment.LatestAction = 
+                    billAmendment.LatestAction = context.Mapper.Map<Original.LatestAction, Cleaned.BillAmendmentAction>(amendment.LatestAction);
+                    billAmendment.Links = context.Mapper.Map<Original.Links, IReadOnlyCollection<Cleaned.Link>>(amendment.Links);
+                    billAmendment.Notes = context.Mapper.Map<Original.Notes, IReadOnlyCollection<Cleaned.BillNote>>(amendment.Notes);
+                    billAmendment.Sponsors = context.Mapper.Map<Original.Sponsors, IReadOnlyCollection<Cleaned.BillAmendmentSponsor>>(amendment.Sponsors);
+                    billAmendment.Titles = context.Mapper.Map<Original.Titles, IReadOnlyCollection<Cleaned.BillTitle>>(amendment.Titles);
 
                     billAmendments.Add(billAmendment);
                 }
@@ -208,19 +212,6 @@ namespace CongressCollector.Models
 
             return billAmendments.AsReadOnly();
         }
-
-        private IReadOnlyCollection<Cleaned.BillAmendmentAction> GetBillAmentmentActions(ResolutionContext context, Original.Actions actions)
-        {
-            List<Cleaned.BillAmendmentAction> billAmendmentActions = new List<Cleaned.BillAmendmentAction>();
-
-            if (actions != null && actions.Items != null)
-            {
-                billAmendmentActions = context.Mapper.Map<List<Original.Item>, List<Cleaned.BillAmendmentAction>>(actions.Items);
-            }
-
-            return billAmendmentActions.AsReadOnly();
-        }
-
 
         private IReadOnlyCollection<Cleaned.BillAction> GetBillActions(ResolutionContext context, Original.Actions actions)
         {

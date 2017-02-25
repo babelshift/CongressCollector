@@ -288,7 +288,7 @@ namespace CongressCollector.Models.Cleaned
     {
         public string Name { get; set; }
         public string State { get; set; }
-        public string BioGuideId { get; set; }
+        public string BioguideId { get; set; }
         public string Party { get; set; }
         public string MiddleName { get; set; }
         public string FullName { get; set; }

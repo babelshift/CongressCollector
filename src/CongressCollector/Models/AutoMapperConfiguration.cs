@@ -39,9 +39,26 @@ namespace CongressCollector.Models
 
                     x.CreateMap<Original.Item, Cleaned.CalendarNumber>();
 
+                    x.CreateMap<Original.Item, Cleaned.BillAmendmentSponsor>();
+
+                    x.CreateMap<Original.Item, Cleaned.BillTitle>();
+
                     x.CreateMap<Original.Cosponsors, Cleaned.BillAmendmentCosponsor>();
 
                     x.CreateMap<Original.Links, IReadOnlyCollection<Cleaned.Link>>().ConvertUsing<LinksTypeConverter>();
+
+                    x.CreateMap<Original.Notes, IReadOnlyCollection<Cleaned.BillNote>>().ConvertUsing<NotesTypeConverter>();
+
+                    x.CreateMap<Original.Actions, IReadOnlyCollection<Cleaned.BillAmendmentAction>>().ConvertUsing<BillAmendmentActionsTypeConverter>();
+
+                    x.CreateMap<Original.Sponsors, IReadOnlyCollection<Cleaned.BillAmendmentSponsor>>().ConvertUsing<BillAmentmentSponsorsTypeConverter>();
+                    
+                    x.CreateMap<Original.Titles, IReadOnlyCollection<Cleaned.BillTitle>>().ConvertUsing<BillTitlesTypeConverter>();
+
+                    x.CreateMap<Original.LatestAction, Cleaned.BillAmendmentAction>()
+                        .ForMember(dest => dest.ActionDate,
+                        opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.ActionDate, src.ActionTime)));
+
 
                     x.CreateMap<Original.Item, Cleaned.BillAmendmentAction>()
                         .ForMember(dest => dest.ActionDate,

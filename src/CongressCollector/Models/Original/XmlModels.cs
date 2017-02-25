@@ -222,7 +222,7 @@ namespace CongressCollector.Models.Original
         [XmlElement(ElementName = "count")]
         public string Count { get; set; }
         [XmlElement(ElementName = "actions")]
-        public Actions ActionsInner { get; set; }
+        public Actions InnerActions { get; set; }
     }
 
     [XmlRoot(ElementName = "cosponsors")]
@@ -240,7 +240,7 @@ namespace CongressCollector.Models.Original
     public class Sponsors
     {
         [XmlElement(ElementName = "item")]
-        public Item Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "amendments")]
