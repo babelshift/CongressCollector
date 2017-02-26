@@ -42,8 +42,22 @@ namespace CongressCollector.Models
                     x.CreateMap<Original.Item, Cleaned.BillAmendmentSponsor>();
 
                     x.CreateMap<Original.Item, Cleaned.BillTitle>();
+                    
+                    x.CreateMap<Original.Identifiers, Cleaned.Identifiers>();
+
+                    x.CreateMap<Original.PolicyArea, Cleaned.PolicyArea>();
+
+                    x.CreateMap<Original.Item, Cleaned.BillCosponsor>()
+                        .ForMember(dest => dest.IsOriginalCosponsor,
+                        opts => opts.MapFrom(src => ParseHelpers.ParseNullableBoolean(src.IsOriginalCosponsor)))
+                        .ForMember(dest => dest.SponsorshipDate,
+                        opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.SponsorshipDate)))
+                        .ForMember(dest => dest.SponsorshipWithdrawnDate,
+                        opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.SponsorshipWithdrawnDate)));
 
                     x.CreateMap<Original.Cosponsors, Cleaned.BillAmendmentCosponsor>();
+
+                    x.CreateMap<Original.RecordedVotes, IReadOnlyCollection<Cleaned.RecordedVote>>().ConvertUsing<RecordedVotesTypeConverter>();
 
                     x.CreateMap<Original.Links, IReadOnlyCollection<Cleaned.Link>>().ConvertUsing<LinksTypeConverter>();
 
@@ -59,6 +73,9 @@ namespace CongressCollector.Models
                         .ForMember(dest => dest.ActionDate,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.ActionDate, src.ActionTime)));
 
+                    x.CreateMap<Original.LatestAction, Cleaned.BillAction>()
+                        .ForMember(dest => dest.ActionDate,
+                        opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.ActionDate, src.ActionTime)));
 
                     x.CreateMap<Original.Item, Cleaned.BillAmendmentAction>()
                         .ForMember(dest => dest.ActionDate,
@@ -77,6 +94,22 @@ namespace CongressCollector.Models
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.Date)));
 
                     x.CreateMap<Original.Bill, Cleaned.Bill>().ConvertUsing<BillTypeConverter>();
+
+                    x.CreateMap<Original.RelationshipDetails, IReadOnlyCollection<Cleaned.RelationshipDetail>>().ConvertUsing<RelationshipDetailsTypeConverter>();
+
+                    x.CreateMap<Original.Item, Cleaned.RelatedBill>()
+                        .ForMember(dest => dest.RelationshipDetails,
+                        opts => opts.MapFrom(src => src.RelationshipDetails));
+
+                    x.CreateMap<Original.Item, Cleaned.RelationshipDetail>();
+
+                    x.CreateMap<Original.Item, Cleaned.Law>();
+
+                    x.CreateMap<Original.Item, Cleaned.BillSponsor>();
+
+                    x.CreateMap<Original.Subjects, Cleaned.BillSubject>().ConvertUsing<SubjectTypeConverter>();
+
+                    x.CreateMap<Original.Item, Cleaned.BillTitle>();
                 });
             }
 

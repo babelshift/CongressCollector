@@ -12,6 +12,19 @@ namespace CongressCollector.Models.Utilities
             return items != null && items.Count > 0 ? items[0] : String.Empty;
         }
 
+        public static bool? ParseNullableBoolean(string rawValue)
+        {
+            if (String.IsNullOrWhiteSpace(rawValue)) { return null; }
+
+            bool value;
+            if(bool.TryParse(rawValue, out value))
+            {
+                return value;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Attempts to combine a date and time to form a DateTime. Ignores the time component if it's empty or white space only.
         /// </summary>

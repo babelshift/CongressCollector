@@ -16,20 +16,20 @@ namespace CongressCollector.Models.Cleaned
         public DateTime? CreateDate { get; set; }
         public DateTime? IntroducedDate { get; set; }
         public PolicyArea PolicyArea { get; set; }
-        public IReadOnlyCollection<BillAction> Actions { get; set; }
-        public IReadOnlyCollection<BillAmendment> Amendments { get; set; }
-        public IReadOnlyCollection<CBOCostEstimate> CBOCostEstimates { get; set; }
-        public IReadOnlyCollection<CommitteeReport> CommitteeReports { get; set; }
+        public IReadOnlyCollection<BillAction> BillActions { get; set; }
+        public IReadOnlyCollection<BillAmendment> BillAmendments { get; set; }
+        public IReadOnlyCollection<CBOCostEstimate> BillCBOCostEstimates { get; set; }
+        public IReadOnlyCollection<CommitteeReport> BillCommitteeReports { get; set; }
         public IReadOnlyCollection<Law> Laws { get; set; }
-        public IReadOnlyCollection<BillSubject> Subjects { get; set; }
-        public IReadOnlyCollection<BillSponsor> Sponsors { get; set; }
-        public IReadOnlyCollection<Committee> Committees { get; set; }
-        public IReadOnlyCollection<BillNote> Notes { get; set; }
+        public BillSubject BillSubject { get; set; }
+        public IReadOnlyCollection<BillSponsor> BillSponsors { get; set; }
+        public IReadOnlyCollection<Committee> BillCommittees { get; set; }
+        public IReadOnlyCollection<BillNote> BillNotes { get; set; }
         public IReadOnlyCollection<RecordedVote> RecordedVotes { get; set; }
-        public IReadOnlyCollection<BillCosponsor> Cosponsors { get; set; }
+        public IReadOnlyCollection<BillCosponsor> BillCosponsors { get; set; }
         public IReadOnlyCollection<RelatedBill> RelatedBills { get; set; }
         public IReadOnlyCollection<BillSummary> BillSummaries { get; set; }
-        public IReadOnlyCollection<BillTitle> Titles { get; set; }
+        public IReadOnlyCollection<BillTitle> BillTitles { get; set; }
         public IReadOnlyCollection<CalendarNumber> CalendarNumbers { get; set; }
     }
 
@@ -68,20 +68,20 @@ namespace CongressCollector.Models.Cleaned
     public class RelatedBill
     {
         public string LatestTitle { get; set; }
-        public int Number { get; set; }
+        public string Number { get; set; }
         public string Type { get; set; }
-        public int Congress { get; set; }
-        public IReadOnlyCollection<RelatedBillAction> Actions { get; set; }
-        public IReadOnlyCollection<RelatedBillRelationshipDetail> RelationshipDetails { get; set; }
+        public string Congress { get; set; }
+        public BillAction LatestAction { get; set; }
+        public IReadOnlyCollection<RelationshipDetail> RelationshipDetails { get; set; }
     }
 
     public class RelatedBillAction
     {
-        public DateTime Date { get; set; } // combine time+date
+        public DateTime? Date { get; set; } // combine time+date
         public string Text { get; set; }
     }
 
-    public class RelatedBillRelationshipDetail
+    public class RelationshipDetail
     {
         public string Type { get; set; }
         public string IdentifiedBy { get; set; }
@@ -90,28 +90,28 @@ namespace CongressCollector.Models.Cleaned
     public class BillCosponsor
     {
         public string Party { get; set; }
-        public int District { get; set; }
+        public string District { get; set; }
         public string MiddleName { get; set; }
         public string BioGuideId { get; set; }
-        public DateTime SponsorshipDate { get; set; }
-        public bool IsOriginalCosponsor { get; set; }
+        public DateTime? SponsorshipDate { get; set; }
+        public bool? IsOriginalCosponsor { get; set; }
         public string FirstName { get; set; }
         public string FullName { get; set; }
-        public DateTime SponsorshipWithdrawnDate { get; set; }
-        public IReadOnlyCollection<Identifier> Identifiers { get; set; }
+        public DateTime? SponsorshipWithdrawnDate { get; set; }
+        public Identifiers Identifiers { get; set; }
         public string LastName { get; set; }
         public string State { get; set; }
     }
 
     public class RecordedVote
     {
-        public string Name { get; set; }
-        public DateTime Date { get; set; }
-        public int RollNumber { get; set; }
-        public int Congress { get; set; }
+        public string FullActionName { get; set; }
+        public DateTime? Date { get; set; }
+        public string RollNumber { get; set; }
+        public string Congress { get; set; }
         public string Chamber { get; set; }
         public Uri URL { get; set; }
-        public int SessionNumber { get; set; }
+        public string SessionNumber { get; set; }
     }
 
     public class Committee
@@ -158,19 +158,19 @@ namespace CongressCollector.Models.Cleaned
         public string ByRequestType { get; set; }
         public string LastName { get; set; }
         public string Party { get; set; }
-        public string BioGuideId { get; set; }
-        public IReadOnlyCollection<Identifier> Identifiers { get; set; }
+        public string BioguideId { get; set; }
+        public Identifiers Identifiers { get; set; }
         public string MiddleName { get; set; }
-        public int District { get; set; }
+        public string District { get; set; }
         public string State { get; set; }
         public string FirstName { get; set; }
     }
 
-    public class Identifier
+    public class Identifiers
     {
-        public int LISID { get; set; }
-        public int GPOID { get; set; }
-        public string BioGuideId { get; set; }
+        public string LISID { get; set; }
+        public string GPOID { get; set; }
+        public string BioguideId { get; set; }
     }
 
     public class BillSubject

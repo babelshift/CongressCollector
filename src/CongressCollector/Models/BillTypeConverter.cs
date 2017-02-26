@@ -23,18 +23,88 @@ namespace CongressCollector.Models
             bill.UpdateDate = ParseHelpers.ParseNullableDateTime(source.UpdateDate);
             bill.IntroducedDate = ParseHelpers.ParseNullableDateTime(source.IntroducedDate);
             bill.CreateDate = ParseHelpers.ParseNullableDateTime(source.CreateDate);
-            bill.Actions = GetBillActions(context, source.Actions);
-            bill.Amendments = GetBillAmendments(context, source.Amendments);
+            bill.BillActions = GetBillActions(context, source.Actions);
+            bill.BillAmendments = GetBillAmendments(context, source.Amendments);
             bill.BillSummaries = GetBillSummaries(source.Summaries);
-            bill.CalendarNumbers = GetCalendarNumbers(context, source.CalendarNumbers);
-            bill.CBOCostEstimates = GetCBOCostEstimates(source.CboCostEstimates);
-            bill.CommitteeReports = GetCommitteeReports(context, source.CommitteeReports);
-            bill.Committees = GetCommittees(context, source.Committees);
+            bill.CalendarNumbers = GetBillCalendarNumbers(context, source.CalendarNumbers);
+            bill.BillCBOCostEstimates = GetBillCBOCostEstimates(source.CboCostEstimates);
+            bill.BillCommitteeReports = GetBillCommitteeReports(context, source.CommitteeReports);
+            bill.BillCommittees = GetBillCommittees(context, source.Committees);
+            bill.BillCosponsors = GetBillCosponsors(context, source.Cosponsors);
+            bill.LatestAction = context.Mapper.Map<Original.LatestAction, Cleaned.BillAction>(source.LatestAction);
+            bill.Laws = GetBillLaws(context, source.Laws);
+            bill.BillNotes = context.Mapper.Map<Original.Notes, IReadOnlyCollection<Cleaned.BillNote>>(source.Notes);
+            bill.PolicyArea = context.Mapper.Map<Original.PolicyArea, Cleaned.PolicyArea>(source.PolicyArea);
+            bill.RecordedVotes = context.Mapper.Map<Original.RecordedVotes, IReadOnlyCollection<Cleaned.RecordedVote>>(source.RecordedVotes);
+            bill.RelatedBills = GetRelatedBills(context, source.RelatedBills);
+            bill.BillSponsors = GetBillSponsors(context, source.Sponsors);
+            bill.BillSubject = context.Mapper.Map<Original.Subjects, Cleaned.BillSubject>(source.Subjects);
+            bill.BillTitles = GetBillTitles(context, source.Titles);
 
             return bill;
         }
 
-        private IReadOnlyCollection<Cleaned.Committee> GetCommittees(ResolutionContext context, Committees committees)
+        private IReadOnlyCollection<BillTitle> GetBillTitles(ResolutionContext context, Original.Titles titles)
+        {
+            List<Cleaned.BillTitle> billTitles = new List<Cleaned.BillTitle>();
+
+            if (titles != null && titles.Items != null)
+            {
+                billTitles = context.Mapper.Map<List<Original.Item>, List<Cleaned.BillTitle>>(titles.Items);
+            }
+
+            return billTitles.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<BillSponsor> GetBillSponsors(ResolutionContext context, Original.Sponsors sponsors)
+        {
+            List<Cleaned.BillSponsor> billSponsors = new List<Cleaned.BillSponsor>();
+
+            if (sponsors != null && sponsors.Items != null)
+            {
+                billSponsors = context.Mapper.Map<List<Original.Item>, List<Cleaned.BillSponsor>>(sponsors.Items);
+            }
+
+            return billSponsors.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<RelatedBill> GetRelatedBills(ResolutionContext context, RelatedBills relatedBills)
+        {
+            List<Cleaned.RelatedBill> billRelatedBills = new List<Cleaned.RelatedBill>();
+
+            if (relatedBills != null && relatedBills.Items != null)
+            {
+                billRelatedBills = context.Mapper.Map<List<Original.Item>, List<Cleaned.RelatedBill>>(relatedBills.Items);
+            }
+
+            return billRelatedBills.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<Law> GetBillLaws(ResolutionContext context, Original.Laws laws)
+        {
+            List<Cleaned.Law> billLaws = new List<Cleaned.Law>();
+
+            if (laws != null && laws.Items != null)
+            {
+                billLaws = context.Mapper.Map<List<Original.Item>, List<Cleaned.Law>>(laws.Items);
+            }
+
+            return billLaws.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<BillCosponsor> GetBillCosponsors(ResolutionContext context, Original.Cosponsors cosponsors)
+        {
+            List<Cleaned.BillCosponsor> billCosponsors = new List<Cleaned.BillCosponsor>();
+
+            if(cosponsors != null && cosponsors.Items != null)
+            {
+                billCosponsors = context.Mapper.Map<List<Original.Item>, List<Cleaned.BillCosponsor>>(cosponsors.Items);
+            }
+
+            return billCosponsors.AsReadOnly();
+        }
+
+        private IReadOnlyCollection<Cleaned.Committee> GetBillCommittees(ResolutionContext context, Original.Committees committees)
         {
             List<Cleaned.Committee> billCommittees = new List<Cleaned.Committee>();
 
@@ -102,7 +172,7 @@ namespace CongressCollector.Models
             return billCommitteeActivities.AsReadOnly();
         }
 
-        private IReadOnlyCollection<Cleaned.CommitteeReport> GetCommitteeReports(ResolutionContext context, Original.CommitteeReports committeeReports)
+        private IReadOnlyCollection<Cleaned.CommitteeReport> GetBillCommitteeReports(ResolutionContext context, Original.CommitteeReports committeeReports)
         {
             List<Cleaned.CommitteeReport> billCommitteeReports = new List<Cleaned.CommitteeReport>();
 
@@ -114,7 +184,7 @@ namespace CongressCollector.Models
             return billCommitteeReports.AsReadOnly();
         }
 
-        private IReadOnlyCollection<CBOCostEstimate> GetCBOCostEstimates(Original.CboCostEstimates cboCostEstimates)
+        private IReadOnlyCollection<CBOCostEstimate> GetBillCBOCostEstimates(Original.CboCostEstimates cboCostEstimates)
         {
             List<Cleaned.CBOCostEstimate> billCboCostEstimates = new List<Cleaned.CBOCostEstimate>();
 
@@ -136,7 +206,7 @@ namespace CongressCollector.Models
             return billCboCostEstimates.AsReadOnly();
         }
 
-        private IReadOnlyCollection<Cleaned.CalendarNumber> GetCalendarNumbers(ResolutionContext context, Original.CalendarNumber calendarNumbers)
+        private IReadOnlyCollection<Cleaned.CalendarNumber> GetBillCalendarNumbers(ResolutionContext context, Original.CalendarNumber calendarNumbers)
         {
             List<Cleaned.CalendarNumber> billCalendarNumbers = new List<Cleaned.CalendarNumber>();
 

@@ -119,6 +119,8 @@ namespace CongressCollector.Models.Original
         public string ChamberName { get; set; }
         [XmlElement(ElementName = "date")]
         public string Date { get; set; }
+        [XmlElement(ElementName = "identifiedBy")]
+        public string IdentifiedBy { get; set; }
     }
 
     [XmlRoot(ElementName = "committee")]
@@ -381,14 +383,14 @@ namespace CongressCollector.Models.Original
     public class Laws
     {
         [XmlElement(ElementName = "item")]
-        public Item Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "legislativeSubjects")]
     public class LegislativeSubjects
     {
         [XmlElement(ElementName = "item")]
-        public List<Item> Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "policyArea")]
@@ -418,11 +420,11 @@ namespace CongressCollector.Models.Original
     public class Identifiers
     {
         [XmlElement(ElementName = "lisID")]
-        public string LisID { get; set; }
+        public string LISID { get; set; }
         [XmlElement(ElementName = "bioguideId")]
         public string BioguideId { get; set; }
         [XmlElement(ElementName = "gpoId")]
-        public string GpoId { get; set; }
+        public string GPOID { get; set; }
     }
 
     [XmlRoot(ElementName = "activities")]
@@ -476,21 +478,21 @@ namespace CongressCollector.Models.Original
     public class RecordedVotes
     {
         [XmlElement(ElementName = "recordedVote")]
-        public List<RecordedVote> RecordedVote { get; set; }
+        public List<RecordedVote> InnerRecordedVotes { get; set; }
     }
 
     [XmlRoot(ElementName = "relationshipDetails")]
     public class RelationshipDetails
     {
         [XmlElement(ElementName = "item")]
-        public Item Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "relatedBills")]
     public class RelatedBills
     {
         [XmlElement(ElementName = "item")]
-        public List<Item> Item { get; set; }
+        public List<Item> Items { get; set; }
     }
 
     [XmlRoot(ElementName = "billSummaries")]
