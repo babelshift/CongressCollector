@@ -1,3 +1,5 @@
+using CongressCollector.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,9 +7,6 @@ using System.IO.Compression;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using CongressCollector.Models;
-using Newtonsoft.Json;
 
 namespace CongressCollector
 {
@@ -30,7 +29,7 @@ namespace CongressCollector
         {
             bulkDataCollectionName = collectionName.ToUpper();
             bulkDataZipBaseUrl = bulkDataBaseUrl + bulkDataCollectionName;
-            outputPathActual = outputBasePathDefault + "/" + bulkDataCollectionName;
+            outputPathActual = Path.Combine(outputBasePathDefault, bulkDataCollectionName);
         }
 
         /// <summary>
@@ -64,7 +63,7 @@ namespace CongressCollector
                 }
 
                 // Override the output path with that value if all is good
-                this.outputPathActual = outputPath + "/" + bulkDataCollectionName;
+                this.outputPathActual = Path.Combine(outputPath, bulkDataCollectionName);
             }
 
             List<BulkDataZipUrl> bulkDataZipUrls = new List<BulkDataZipUrl>();
@@ -111,48 +110,80 @@ namespace CongressCollector
             // Collect and process the ZIP files found at the URLs determined from our parameter evaluation above
             foreach (var bulkDataZipUrl in bulkDataZipUrls)
             {
-                string outputPathWithBillType = String.Format("{0}/{1}/{2}", outputPathActual, bulkDataZipUrl.Congress, bulkDataZipUrl.Measure);
+                string outputPathWithBillType = Path.Combine(outputPathActual, bulkDataZipUrl.Congress.ToString(), bulkDataZipUrl.Measure);
 
                 if (!Directory.Exists(outputPathWithBillType))
                 {
                     Directory.CreateDirectory(outputPathWithBillType);
                 }
 
-                //using (var zipStream = await httpClient.GetStreamAsync(bulkDataZipUrl.ToString()))
-                //{
-                using (var zipStream = File.Open(@"C:\Users\justin\Desktop\BILLSTATUS-114-hr.zip", FileMode.Open))
+                using (var zipStream = await httpClient.GetStreamAsync(bulkDataZipUrl.ToString()))
                 {
                     using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
                     {
                         foreach (var entry in archive.Entries)
                         {
-                            // Open the currently processed XML file, serialize it to a XML string, and then write to a file output
+                            // Open the currently processing file, read into memory, write to XML and JSON
                             using (Stream entryStream = entry.Open())
                             {
-                                //using (Stream entryStream = File.Open(@"C:\Users\justin\Desktop\BILLSTATUS-114-hr\BILLSTATUS-114hr1020.xml", FileMode.Open))
-                                //{
                                 using (MemoryStream entryMemoryStream = new MemoryStream())
                                 {
                                     entryStream.CopyTo(entryMemoryStream);
                                     byte[] entryMemoryStreamBytes = entryMemoryStream.ToArray();
 
-                                    string originalXml = Encoding.UTF8.GetString(entryMemoryStreamBytes);
-                                    string outputXmlPath = Path.Combine(outputPathWithBillType, entry.Name);
-                                    File.WriteAllText(outputXmlPath, originalXml);
-                                    
-                                    var originalObjects = XmlHelper.DeserializeXML<Models.Original.BillStatus>(entryMemoryStreamBytes);
-                                    var cleanedObjects = AutoMapperConfiguration.Mapper.Map<Models.Original.Bill, Models.Cleaned.Bill>(originalObjects.Bill);
+                                    WriteXmlFile(outputPathWithBillType, entry.Name, entryMemoryStreamBytes);
 
-                                    string cleanedJson = JsonConvert.SerializeObject(cleanedObjects);
-                                    string jsonFileName = Path.GetFileNameWithoutExtension(entry.Name) + ".json";
-                                    string outputJsonPath = Path.Combine(outputPathWithBillType, jsonFileName);
-                                    File.WriteAllText(outputJsonPath, cleanedJson);
+                                    WriteJsonFile(outputPathWithBillType, entry.Name, entryMemoryStreamBytes);
                                 }
                             }
                         }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Writes a JSON file out after cleaning up the data structure received from the XML contents.
+        /// </summary>
+        /// <param name="outputPathWithBillType"></param>
+        /// <param name="zipArchiveEntryName"></param>
+        /// <param name="entryMemoryStreamBytes"></param>
+        private static void WriteJsonFile(string outputPathWithBillType, string zipArchiveEntryName, byte[] entryMemoryStreamBytes)
+        {
+            if (String.IsNullOrWhiteSpace(zipArchiveEntryName) || entryMemoryStreamBytes == null || entryMemoryStreamBytes.Length == 0)
+            {
+                return;
+            }
+
+            // Deserialize the XML to objects
+            var originalObjects = XmlHelper.DeserializeXML<Models.Original.BillStatus>(entryMemoryStreamBytes);
+
+            // Clean the objects by mapping to a sane structure with proper data types and serialize to JSON
+            var cleanedObjects = AutoMapperConfiguration.Mapper.Map<Models.Original.Bill, Models.Cleaned.Bill>(originalObjects.Bill);
+            string cleanedJson = JsonConvert.SerializeObject(cleanedObjects);
+
+            // Write out the cleaned JSON contents to a file
+            string jsonFileName = Path.GetFileNameWithoutExtension(zipArchiveEntryName) + ".json";
+            string outputJsonPath = Path.Combine(outputPathWithBillType, jsonFileName);
+            File.WriteAllText(outputJsonPath, cleanedJson);
+        }
+
+        /// <summary>
+        /// Writes the XML file out exactly as it appears from the
+        /// </summary>
+        /// <param name="outputPathWithBillType"></param>
+        /// <param name="zipArchiveEntryName"></param>
+        /// <param name="entryMemoryStreamBytes"></param>
+        private static void WriteXmlFile(string outputPathWithBillType, string zipArchiveEntryName, byte[] entryMemoryStreamBytes)
+        {
+            if (String.IsNullOrWhiteSpace(zipArchiveEntryName) || entryMemoryStreamBytes == null || entryMemoryStreamBytes.Length == 0)
+            {
+                return;
+            }
+
+            string originalXml = Encoding.UTF8.GetString(entryMemoryStreamBytes);
+            string outputXmlPath = Path.Combine(outputPathWithBillType, zipArchiveEntryName);
+            File.WriteAllText(outputXmlPath, originalXml);
         }
 
         /// <summary>

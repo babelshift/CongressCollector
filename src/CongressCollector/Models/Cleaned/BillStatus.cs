@@ -10,18 +10,18 @@ namespace CongressCollector.Models.Cleaned
         public string Title { get; set; }
         public string ConstitutionalAuthorityStatement { get; set; }
         public DateTime? UpdateDate { get; set; }
-        public BillAction LatestAction { get; set; }
         public string BillType { get; set; }
         public string OriginChamber { get; set; }
         public DateTime? CreateDate { get; set; }
         public DateTime? IntroducedDate { get; set; }
         public PolicyArea PolicyArea { get; set; }
+        public BillSubject BillSubject { get; set; }
+        public BillAction LatestAction { get; set; }
         public IReadOnlyCollection<BillAction> BillActions { get; set; }
         public IReadOnlyCollection<BillAmendment> BillAmendments { get; set; }
         public IReadOnlyCollection<CBOCostEstimate> BillCBOCostEstimates { get; set; }
         public IReadOnlyCollection<CommitteeReport> BillCommitteeReports { get; set; }
-        public IReadOnlyCollection<Law> Laws { get; set; }
-        public BillSubject BillSubject { get; set; }
+        public IReadOnlyCollection<BillLaw> Laws { get; set; }
         public IReadOnlyCollection<BillSponsor> BillSponsors { get; set; }
         public IReadOnlyCollection<Committee> BillCommittees { get; set; }
         public IReadOnlyCollection<BillNote> BillNotes { get; set; }
@@ -31,6 +31,10 @@ namespace CongressCollector.Models.Cleaned
         public IReadOnlyCollection<BillSummary> BillSummaries { get; set; }
         public IReadOnlyCollection<BillTitle> BillTitles { get; set; }
         public IReadOnlyCollection<CalendarNumber> CalendarNumbers { get; set; }
+    }
+
+    public class LatestAction
+    {
     }
 
     public class BillNote
@@ -122,7 +126,6 @@ namespace CongressCollector.Models.Cleaned
         public string Type { get; set; }
         public IReadOnlyCollection<CommitteeActivity> Activities { get; set; }
         public IReadOnlyCollection<Subcommittee> Subcommittees { get; set; }
-
     }
 
     public class Subcommittee
@@ -250,7 +253,7 @@ namespace CongressCollector.Models.Cleaned
         public string Description { get; set; }
     }
 
-    public class Law
+    public class BillLaw
     {
         public string Number { get; set; }
         public string Type { get; set; }

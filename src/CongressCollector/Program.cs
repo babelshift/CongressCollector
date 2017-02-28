@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CongressCollector.Models;
 using Microsoft.Extensions.CommandLineUtils;
-using System.Threading.Tasks;
-using System.Linq;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using CongressCollector.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CongressCollector
 {

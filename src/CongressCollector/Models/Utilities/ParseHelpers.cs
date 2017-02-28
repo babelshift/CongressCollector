@@ -1,23 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CongressCollector.Models.Utilities
 {
     public static class ParseHelpers
     {
+        /// <summary>
+        /// Returns the first item in the list or empty if that isn't possible.
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
         public static string GetFirstStringOrEmpty(IList<string> items)
         {
             return items != null && items.Count > 0 ? items[0] : String.Empty;
         }
 
+        /// <summary>
+        /// Returns a nullable boolean parsed from the input value.
+        /// </summary>
+        /// <param name="rawValue"></param>
+        /// <returns></returns>
         public static bool? ParseNullableBoolean(string rawValue)
         {
             if (String.IsNullOrWhiteSpace(rawValue)) { return null; }
 
             bool value;
-            if(bool.TryParse(rawValue, out value))
+            if (bool.TryParse(rawValue, out value))
             {
                 return value;
             }

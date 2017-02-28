@@ -33,7 +33,7 @@ namespace CongressCollector
         /// <returns>C# object representing the XML contents</returns>
         public static T DeserializeXML<T>(byte[] xml)
         {
-            if(xml == null || xml.Length == 0)
+            if (xml == null || xml.Length == 0)
             {
                 return default(T);
             }

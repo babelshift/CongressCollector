@@ -40,14 +40,14 @@ namespace CongressCollector
         /// </summary>
         public static SupportedArgumentChecker Instance
         {
-            get 
+            get
             {
-                if (instance == null) 
+                if (instance == null)
                 {
-                    lock (syncRoot) 
+                    lock (syncRoot)
                     {
-                    if (instance == null) 
-                        instance = new SupportedArgumentChecker();
+                        if (instance == null)
+                            instance = new SupportedArgumentChecker();
                     }
                 }
 
@@ -81,10 +81,10 @@ namespace CongressCollector
         /// <returns>True or false indicating of the passed value is valid</returns>
         public bool IsValidCollection(string collection)
         {
-            if(String.IsNullOrWhiteSpace(collection)) { return false; }
+            if (String.IsNullOrWhiteSpace(collection)) { return false; }
             return collections.Any(x => x.Value == collection);
         }
-        
+
         /// <summary>
         /// Determines if a measure is valid by checking against the checker's known list of measures.
         /// </summary>
@@ -92,10 +92,10 @@ namespace CongressCollector
         /// <returns>True or false indicating of the passed value is valid</returns>
         public bool IsValidMeasure(string measure)
         {
-            if(String.IsNullOrWhiteSpace(measure)) { return false; }
+            if (String.IsNullOrWhiteSpace(measure)) { return false; }
             return measures.Any(x => x.Value == measure);
         }
-        
+
         /// <summary>
         /// Determines if a congress is valid by checking against the checker's known list of congresses.
         /// </summary>
@@ -103,7 +103,7 @@ namespace CongressCollector
         /// <returns>True or false indicating of the passed value is valid</returns>
         public bool IsValidCongress(int congress)
         {
-            if(congress <= 0) { return false; }
+            if (congress <= 0) { return false; }
             return congresses.Any(x => x.Value == congress);
         }
     }
