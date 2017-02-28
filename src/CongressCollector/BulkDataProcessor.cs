@@ -1,4 +1,5 @@
 using CongressCollector.Models;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ namespace CongressCollector
         private readonly string bulkDataZipBaseUrl = String.Empty;
         private string outputPathActual = String.Empty;
         private string bulkDataCollectionName = String.Empty;
+
+        ILogger Logger { get; } = ApplicationLogging.CreateLogger<BulkDataProcessor>();
 
         /// <summary>
         /// Default constructor creates a bulk data processor for a specific collection.
@@ -115,14 +118,17 @@ namespace CongressCollector
                 if (!Directory.Exists(outputPathWithBillType))
                 {
                     Directory.CreateDirectory(outputPathWithBillType);
+                    Logger.LogInformation("Created directory: {0}", outputPathWithBillType);
                 }
-
+                
+                Logger.LogInformation("Downloading file at: {0}", bulkDataZipUrl);
                 using (var zipStream = await httpClient.GetStreamAsync(bulkDataZipUrl.ToString()))
                 {
                     using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
                     {
                         foreach (var entry in archive.Entries)
                         {
+                            Logger.LogInformation("Processing file: {0}", entry.Name);
                             // Open the currently processing file, read into memory, write to XML and JSON
                             using (Stream entryStream = entry.Open())
                             {
@@ -159,7 +165,7 @@ namespace CongressCollector
             var originalObjects = XmlHelper.DeserializeXML<Models.Original.BillStatus>(entryMemoryStreamBytes);
 
             // Clean the objects by mapping to a sane structure with proper data types and serialize to JSON
-            var cleanedObjects = AutoMapperConfiguration.Mapper.Map<Models.Original.Bill, Models.Cleaned.Bill>(originalObjects.Bill);
+            var cleanedObjects = AutoMapperConfiguration.Mapper.Map<Models.Original.Bill, Models.Cleaned.BillStatus>(originalObjects.Bill);
             string cleanedJson = JsonConvert.SerializeObject(cleanedObjects);
 
             // Write out the cleaned JSON contents to a file

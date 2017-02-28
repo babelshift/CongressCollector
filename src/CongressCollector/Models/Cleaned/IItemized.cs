@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CongressCollector.Models
+namespace CongressCollector.Models.Cleaned
 {
     /// <summary>
     /// Any class that implements this is claiming that it is itemized and contains a collection of items

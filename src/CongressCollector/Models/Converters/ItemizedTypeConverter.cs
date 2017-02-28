@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
+using CongressCollector.Models.Cleaned;
 using System.Collections.Generic;
 
-namespace CongressCollector.Models
+namespace CongressCollector.Models.Converters
 {
     /// <summary>
     /// The XML structure of the Bill Status documents from the GPO FDsys database needs to have a special converter applied to many
@@ -21,7 +22,7 @@ namespace CongressCollector.Models
     ///         "name" sample2 "/name"
     ///     "/item"
     /// "/amendments"
-    /// 
+    ///
     /// We apply this converter to this object to transform the list of items to a list of cleaned Amendment objects.
     /// </remarks>
     public class ItemizedTypeConverter<TIn, TOut, TItem> : ITypeConverter<TIn, IReadOnlyCollection<TOut>>

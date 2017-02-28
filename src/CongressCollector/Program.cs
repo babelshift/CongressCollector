@@ -1,5 +1,7 @@
 ﻿using CongressCollector.Models;
 using Microsoft.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +13,8 @@ namespace CongressCollector
     public class Program
     {
         private const string helpOptionText = "-? | -h | --help";
+
+        private static ILogger Logger { get; } = ApplicationLogging.CreateLogger<Program>();
 
         public static void Main(string[] args)
         {
@@ -100,17 +104,18 @@ namespace CongressCollector
                         }
                         catch (DirectoryNotFoundException)
                         {
-                            Console.WriteLine("That output directory doesn't exist. Use the '-f' flag to force use it or change to a different directory.");
+                            Logger.LogError("That output directory doesn't exist. Use the '-f' flag to force use it or change to a different directory.");
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine(ex.Message);
+                            Logger.LogError(ex.Message);
                         }
                     }).Wait();
                     return 0;
                 });
             });
 
+            // Setup options and functionality related to the 'list' command
             commandLineApplication.Command("list", config =>
             {
                 config.Description = "List some valid inputs for commands and options.";

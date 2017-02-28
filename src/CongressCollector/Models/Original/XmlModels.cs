@@ -1,3 +1,4 @@
+using CongressCollector.Models.Cleaned;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 

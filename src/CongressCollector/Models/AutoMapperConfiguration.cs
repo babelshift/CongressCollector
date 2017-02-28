@@ -1,4 +1,5 @@
 using AutoMapper;
+using CongressCollector.Models.Converters;
 using CongressCollector.Models.Utilities;
 using System;
 using System.Collections.Generic;
@@ -26,38 +27,38 @@ namespace CongressCollector.Models
                 {
                     #region Itemized Collection Mappings
 
-                    x.CreateMap<Original.Titles, IReadOnlyCollection<Cleaned.BillTitle>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.Titles, Cleaned.BillTitle, Original.Item>>();
+                    x.CreateMap<Original.Titles, IReadOnlyCollection<Cleaned.BillStatusTitle>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.Titles, Cleaned.BillStatusTitle, Original.Item>>();
 
-                    x.CreateMap<Original.Sponsors, IReadOnlyCollection<Cleaned.BillSponsor>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.Sponsors, Cleaned.BillSponsor, Original.Item>>();
+                    x.CreateMap<Original.Sponsors, IReadOnlyCollection<Cleaned.BillStatusSponsor>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.Sponsors, Cleaned.BillStatusSponsor, Original.Item>>();
 
                     x.CreateMap<Original.Sponsors, IReadOnlyCollection<Cleaned.BillAmendmentSponsor>>()
                         .ConvertUsing<ItemizedTypeConverter<Original.Sponsors, Cleaned.BillAmendmentSponsor, Original.Item>>();
 
-                    x.CreateMap<Original.RelatedBills, IReadOnlyCollection<Cleaned.RelatedBill>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.RelatedBills, Cleaned.RelatedBill, Original.Item>>();
+                    x.CreateMap<Original.RelatedBills, IReadOnlyCollection<Cleaned.BillStatusRelatedBill>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.RelatedBills, Cleaned.BillStatusRelatedBill, Original.Item>>();
 
-                    x.CreateMap<Original.Notes, IReadOnlyCollection<Cleaned.BillNote>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.Notes, Cleaned.BillNote, Original.Item>>();
+                    x.CreateMap<Original.Notes, IReadOnlyCollection<Cleaned.BillStatusNote>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.Notes, Cleaned.BillStatusNote, Original.Item>>();
 
-                    x.CreateMap<Original.Laws, IReadOnlyCollection<Cleaned.BillLaw>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.Laws, Cleaned.BillLaw, Original.Item>>();
+                    x.CreateMap<Original.Laws, IReadOnlyCollection<Cleaned.BillStatusLaw>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.Laws, Cleaned.BillStatusLaw, Original.Item>>();
 
-                    x.CreateMap<Original.Cosponsors, IReadOnlyCollection<Cleaned.BillCosponsor>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.Cosponsors, Cleaned.BillCosponsor, Original.Item>>();
+                    x.CreateMap<Original.Cosponsors, IReadOnlyCollection<Cleaned.BillStatusCosponsor>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.Cosponsors, Cleaned.BillStatusCosponsor, Original.Item>>();
 
-                    x.CreateMap<Original.BillCommittees, IReadOnlyCollection<Cleaned.Committee>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.BillCommittees, Cleaned.Committee, Original.Item>>();
+                    x.CreateMap<Original.BillCommittees, IReadOnlyCollection<Cleaned.BillStatusCommittee>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.BillCommittees, Cleaned.BillStatusCommittee, Original.Item>>();
 
-                    x.CreateMap<Original.CboCostEstimates, IReadOnlyCollection<Cleaned.CBOCostEstimate>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.CboCostEstimates, Cleaned.CBOCostEstimate, Original.Item>>();
+                    x.CreateMap<Original.CboCostEstimates, IReadOnlyCollection<Cleaned.BillStatusCBOCostEstimate>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.CboCostEstimates, Cleaned.BillStatusCBOCostEstimate, Original.Item>>();
 
-                    x.CreateMap<Original.CalendarNumbers, IReadOnlyCollection<Cleaned.CalendarNumber>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.CalendarNumbers, Cleaned.CalendarNumber, Original.Item>>();
+                    x.CreateMap<Original.CalendarNumbers, IReadOnlyCollection<Cleaned.BillStatusCalendarNumber>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.CalendarNumbers, Cleaned.BillStatusCalendarNumber, Original.Item>>();
 
-                    x.CreateMap<Original.Actions, IReadOnlyCollection<Cleaned.BillAction>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.Actions, Cleaned.BillAction, Original.Item>>();
+                    x.CreateMap<Original.Actions, IReadOnlyCollection<Cleaned.BillStatusAction>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.Actions, Cleaned.BillStatusAction, Original.Item>>();
 
                     x.CreateMap<Original.Actions, IReadOnlyCollection<Cleaned.BillAmendmentAction>>()
                         .ConvertUsing(src =>
@@ -73,8 +74,8 @@ namespace CongressCollector.Models
                     x.CreateMap<Original.Links, IReadOnlyCollection<Cleaned.Link>>()
                         .ConvertUsing<ItemizedTypeConverter<Original.Links, Cleaned.Link, Original.Link>>();
 
-                    x.CreateMap<Original.Amendments, IReadOnlyCollection<Cleaned.BillAmendment>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.Amendments, Cleaned.BillAmendment, Original.Amendment>>();
+                    x.CreateMap<Original.Amendments, IReadOnlyCollection<Cleaned.BillStatusAmendment>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.Amendments, Cleaned.BillStatusAmendment, Original.Amendment>>();
 
                     x.CreateMap<Original.LegislativeSubjects, IReadOnlyCollection<Cleaned.LegislativeSubject>>()
                         .ConvertUsing<ItemizedTypeConverter<Original.LegislativeSubjects, Cleaned.LegislativeSubject, Original.Item>>();
@@ -88,32 +89,32 @@ namespace CongressCollector.Models
                     x.CreateMap<Original.Subcommittees, IReadOnlyCollection<Cleaned.Subcommittee>>()
                         .ConvertUsing<ItemizedTypeConverter<Original.Subcommittees, Cleaned.Subcommittee, Original.Item>>();
 
-                    x.CreateMap<Original.BillCommittees, IReadOnlyCollection<Cleaned.Committee>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.BillCommittees, Cleaned.Committee, Original.Item>>();
+                    x.CreateMap<Original.BillCommittees, IReadOnlyCollection<Cleaned.BillStatusCommittee>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.BillCommittees, Cleaned.BillStatusCommittee, Original.Item>>();
 
-                    x.CreateMap<Original.BillSummaries, IReadOnlyCollection<Cleaned.BillSummary>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.BillSummaries, Cleaned.BillSummary, Original.Item>>();
+                    x.CreateMap<Original.BillSummaries, IReadOnlyCollection<Cleaned.BillStatusSummary>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.BillSummaries, Cleaned.BillStatusSummary, Original.Item>>();
 
-                    x.CreateMap<Original.Notes, IReadOnlyCollection<Cleaned.BillNote>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.Notes, Cleaned.BillNote, Original.Item>>();
+                    x.CreateMap<Original.Notes, IReadOnlyCollection<Cleaned.BillStatusNote>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.Notes, Cleaned.BillStatusNote, Original.Item>>();
 
-                    x.CreateMap<Original.CommitteeReports, IReadOnlyCollection<Cleaned.CommitteeReport>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.CommitteeReports, Cleaned.CommitteeReport, Original.CommitteeReport>>();
+                    x.CreateMap<Original.CommitteeReports, IReadOnlyCollection<Cleaned.BillStatusCommitteeReport>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.CommitteeReports, Cleaned.BillStatusCommitteeReport, Original.CommitteeReport>>();
 
-                    x.CreateMap<Original.Committees, IReadOnlyCollection<Cleaned.Committee>>()
+                    x.CreateMap<Original.Committees, IReadOnlyCollection<Cleaned.BillStatusCommittee>>()
                         .ConvertUsing(src =>
                         {
-                            return mapper.Map<Original.BillCommittees, IReadOnlyCollection<Cleaned.Committee>>(src.BillCommittees);
+                            return mapper.Map<Original.BillCommittees, IReadOnlyCollection<Cleaned.BillStatusCommittee>>(src.BillCommittees);
                         });
 
-                    x.CreateMap<Original.Summaries, IReadOnlyCollection<Cleaned.BillSummary>>()
+                    x.CreateMap<Original.Summaries, IReadOnlyCollection<Cleaned.BillStatusSummary>>()
                         .ConvertUsing(src =>
                         {
-                            return mapper.Map<Original.BillSummaries, IReadOnlyCollection<Cleaned.BillSummary>>(src.BillSummaries);
+                            return mapper.Map<Original.BillSummaries, IReadOnlyCollection<Cleaned.BillStatusSummary>>(src.BillSummaries);
                         });
 
-                    x.CreateMap<Original.RecordedVotes, IReadOnlyCollection<Cleaned.RecordedVote>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.RecordedVotes, Cleaned.RecordedVote, Original.RecordedVote>>();
+                    x.CreateMap<Original.RecordedVotes, IReadOnlyCollection<Cleaned.BillStatusRecordedVote>>()
+                        .ConvertUsing<ItemizedTypeConverter<Original.RecordedVotes, Cleaned.BillStatusRecordedVote, Original.RecordedVote>>();
 
                     x.CreateMap<Original.RelationshipDetails, IReadOnlyCollection<Cleaned.RelationshipDetail>>()
                         .ConvertUsing<ItemizedTypeConverter<Original.RelationshipDetails, Cleaned.RelationshipDetail, Original.Item>>();
@@ -126,13 +127,13 @@ namespace CongressCollector.Models
 
                     x.CreateMap<Original.Item, Cleaned.LegislativeSubject>();
 
-                    x.CreateMap<Original.Item, Cleaned.CalendarNumber>();
+                    x.CreateMap<Original.Item, Cleaned.BillStatusCalendarNumber>();
 
                     x.CreateMap<Original.Item, Cleaned.BillAmendmentSponsor>();
 
-                    x.CreateMap<Original.Item, Cleaned.BillNote>();
+                    x.CreateMap<Original.Item, Cleaned.BillStatusNote>();
 
-                    x.CreateMap<Original.Item, Cleaned.BillSummary>()
+                    x.CreateMap<Original.Item, Cleaned.BillStatusSummary>()
                         .ForMember(dest => dest.ActionDate,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.ActionDate)))
                         .ForMember(dest => dest.UpdateDate,
@@ -142,7 +143,7 @@ namespace CongressCollector.Models
                         .ForMember(dest => dest.ActionDescription,
                         opts => opts.MapFrom(src => src.ActionDesc));
 
-                    x.CreateMap<Original.Item, Cleaned.BillCosponsor>()
+                    x.CreateMap<Original.Item, Cleaned.BillStatusCosponsor>()
                         .ForMember(dest => dest.IsOriginalCosponsor,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableBoolean(src.IsOriginalCosponsor)))
                         .ForMember(dest => dest.SponsorshipDate,
@@ -154,7 +155,7 @@ namespace CongressCollector.Models
                         .ForMember(dest => dest.ActionDate,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.ActionDate, src.ActionTime)));
 
-                    x.CreateMap<Original.Item, Cleaned.BillAction>()
+                    x.CreateMap<Original.Item, Cleaned.BillStatusAction>()
                         .ForMember(dest => dest.ActionDate,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.ActionDate, src.ActionTime)));
 
@@ -166,27 +167,27 @@ namespace CongressCollector.Models
                         .ForMember(dest => dest.Date,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.Date)));
 
-                    x.CreateMap<Original.Item, Cleaned.RelatedBill>()
+                    x.CreateMap<Original.Item, Cleaned.BillStatusRelatedBill>()
                         .ForMember(dest => dest.RelationshipDetails,
                         opts => opts.MapFrom(src => src.RelationshipDetails));
 
                     x.CreateMap<Original.Item, Cleaned.RelationshipDetail>();
 
-                    x.CreateMap<Original.Item, Cleaned.BillLaw>();
+                    x.CreateMap<Original.Item, Cleaned.BillStatusLaw>();
 
-                    x.CreateMap<Original.Item, Cleaned.BillSponsor>();
+                    x.CreateMap<Original.Item, Cleaned.BillStatusSponsor>();
 
-                    x.CreateMap<Original.Item, Cleaned.BillTitle>();
+                    x.CreateMap<Original.Item, Cleaned.BillStatusTitle>();
 
-                    x.CreateMap<Original.Item, Cleaned.Committee>();
+                    x.CreateMap<Original.Item, Cleaned.BillStatusCommittee>();
 
-                    x.CreateMap<Original.Item, Cleaned.CBOCostEstimate>()
+                    x.CreateMap<Original.Item, Cleaned.BillStatusCBOCostEstimate>()
                         .ForMember(dest => dest.PublishedDate,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.PubDate)))
                         .ForMember(dest => dest.URL,
                         opts => opts.MapFrom(src => new Uri(src.Url)));
 
-                    x.CreateMap<Original.RecordedVote, Cleaned.RecordedVote>()
+                    x.CreateMap<Original.RecordedVote, Cleaned.BillStatusRecordedVote>()
                         .ForMember(dest => dest.Date,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.Date)))
                         .ForMember(dest => dest.URL,
@@ -198,7 +199,7 @@ namespace CongressCollector.Models
                         .ForMember(dest => dest.URL,
                         opts => opts.MapFrom(src => new Uri(src.Url)));
 
-                    x.CreateMap<Original.Amendment, Cleaned.BillAmendment>()
+                    x.CreateMap<Original.Amendment, Cleaned.BillStatusAmendment>()
                         .ForMember(dest => dest.Congress,
                         opts => opts.MapFrom(src => ParseHelpers.GetFirstStringOrEmpty(src.Congress)))
                         .ForMember(dest => dest.CreateDate,
@@ -226,7 +227,7 @@ namespace CongressCollector.Models
 
                     x.CreateMap<Original.SourceSystem, Cleaned.SourceSystem>();
 
-                    x.CreateMap<Original.CommitteeReport, Cleaned.CommitteeReport>();
+                    x.CreateMap<Original.CommitteeReport, Cleaned.BillStatusCommitteeReport>();
 
                     x.CreateMap<Original.Identifiers, Cleaned.Identifiers>();
 
@@ -234,17 +235,13 @@ namespace CongressCollector.Models
 
                     x.CreateMap<Original.Cosponsors, Cleaned.BillAmendmentCosponsor>();
 
-                    x.CreateMap<Original.LatestAction, Cleaned.BillAmendmentAction>()
+                    x.CreateMap<Original.LatestAction, Cleaned.LatestAction>()
                         .ForMember(dest => dest.ActionDate,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.ActionDate, src.ActionTime)));
 
-                    x.CreateMap<Original.LatestAction, Cleaned.BillAction>()
-                        .ForMember(dest => dest.ActionDate,
-                        opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.ActionDate, src.ActionTime)));
+                    x.CreateMap<Original.Bill, Cleaned.BillStatus>().ConvertUsing<BillStatusTypeConverter>();
 
-                    x.CreateMap<Original.Bill, Cleaned.Bill>().ConvertUsing<BillTypeConverter>();
-
-                    x.CreateMap<Original.Subjects, Cleaned.BillSubject>()
+                    x.CreateMap<Original.Subjects, Cleaned.BillStatusSubject>()
                         .ForMember(dest => dest.LegislativeSubjects,
                         opts => opts.MapFrom(src =>
                             src.BillSubjects != null

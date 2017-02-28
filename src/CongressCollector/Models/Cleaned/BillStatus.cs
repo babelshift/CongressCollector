@@ -3,53 +3,55 @@ using System.Collections.Generic;
 
 namespace CongressCollector.Models.Cleaned
 {
-    public class Bill
+    public class BillStatus
     {
-        public string BillNumber { get; set; }
+        public string Number { get; set; }
         public string Congress { get; set; }
         public string Title { get; set; }
         public string ConstitutionalAuthorityStatement { get; set; }
-        public DateTime? UpdateDate { get; set; }
-        public string BillType { get; set; }
+        public string Type { get; set; }
         public string OriginChamber { get; set; }
-        public DateTime? CreateDate { get; set; }
         public DateTime? IntroducedDate { get; set; }
+        public DateTime? CreateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
         public PolicyArea PolicyArea { get; set; }
-        public BillSubject BillSubject { get; set; }
-        public BillAction LatestAction { get; set; }
-        public IReadOnlyCollection<BillAction> BillActions { get; set; }
-        public IReadOnlyCollection<BillAmendment> BillAmendments { get; set; }
-        public IReadOnlyCollection<CBOCostEstimate> BillCBOCostEstimates { get; set; }
-        public IReadOnlyCollection<CommitteeReport> BillCommitteeReports { get; set; }
-        public IReadOnlyCollection<BillLaw> Laws { get; set; }
-        public IReadOnlyCollection<BillSponsor> BillSponsors { get; set; }
-        public IReadOnlyCollection<Committee> BillCommittees { get; set; }
-        public IReadOnlyCollection<BillNote> BillNotes { get; set; }
-        public IReadOnlyCollection<RecordedVote> RecordedVotes { get; set; }
-        public IReadOnlyCollection<BillCosponsor> BillCosponsors { get; set; }
-        public IReadOnlyCollection<RelatedBill> RelatedBills { get; set; }
-        public IReadOnlyCollection<BillSummary> BillSummaries { get; set; }
-        public IReadOnlyCollection<BillTitle> BillTitles { get; set; }
-        public IReadOnlyCollection<CalendarNumber> CalendarNumbers { get; set; }
+        public BillStatusSubject Subject { get; set; }
+        public LatestAction LatestAction { get; set; }
+        public IReadOnlyCollection<BillStatusAction> Actions { get; set; }
+        public IReadOnlyCollection<BillStatusAmendment> Amendments { get; set; }
+        public IReadOnlyCollection<BillStatusCBOCostEstimate> CBOCostEstimates { get; set; }
+        public IReadOnlyCollection<BillStatusCommitteeReport> CommitteeReports { get; set; }
+        public IReadOnlyCollection<BillStatusLaw> Laws { get; set; }
+        public IReadOnlyCollection<BillStatusSponsor> Sponsors { get; set; }
+        public IReadOnlyCollection<BillStatusCommittee> Committees { get; set; }
+        public IReadOnlyCollection<BillStatusNote> Notes { get; set; }
+        public IReadOnlyCollection<BillStatusRecordedVote> RecordedVotes { get; set; }
+        public IReadOnlyCollection<BillStatusCosponsor> Cosponsors { get; set; }
+        public IReadOnlyCollection<BillStatusRelatedBill> RelatedBills { get; set; }
+        public IReadOnlyCollection<BillStatusSummary> Summaries { get; set; }
+        public IReadOnlyCollection<BillStatusTitle> Titles { get; set; }
+        public IReadOnlyCollection<BillStatusCalendarNumber> CalendarNumbers { get; set; }
     }
 
     public class LatestAction
     {
+        public DateTime? ActionDate { get; set; }
+        public string Text { get; set; }
     }
 
-    public class BillNote
+    public class BillStatusNote
     {
         public string Text { get; set; }
         public IReadOnlyCollection<Link> Links { get; set; }
     }
 
-    public class CalendarNumber
+    public class BillStatusCalendarNumber
     {
         public string Calendar { get; set; }
         public string Number { get; set; }
     }
 
-    public class BillTitle
+    public class BillStatusTitle
     {
         public string ChamberCode { get; set; }
         public string ChamberName { get; set; }
@@ -58,7 +60,7 @@ namespace CongressCollector.Models.Cleaned
         public string TitleType { get; set; }
     }
 
-    public class BillSummary
+    public class BillStatusSummary
     {
         public DateTime? ActionDate { get; set; }
         public string ActionDescription { get; set; }
@@ -69,13 +71,13 @@ namespace CongressCollector.Models.Cleaned
         public string VersionCode { get; set; }
     }
 
-    public class RelatedBill
+    public class BillStatusRelatedBill
     {
         public string LatestTitle { get; set; }
         public string Number { get; set; }
         public string Type { get; set; }
         public string Congress { get; set; }
-        public BillAction LatestAction { get; set; }
+        public LatestAction LatestAction { get; set; }
         public IReadOnlyCollection<RelationshipDetail> RelationshipDetails { get; set; }
     }
 
@@ -91,7 +93,7 @@ namespace CongressCollector.Models.Cleaned
         public string IdentifiedBy { get; set; }
     }
 
-    public class BillCosponsor
+    public class BillStatusCosponsor
     {
         public string Party { get; set; }
         public string District { get; set; }
@@ -107,7 +109,7 @@ namespace CongressCollector.Models.Cleaned
         public string State { get; set; }
     }
 
-    public class RecordedVote
+    public class BillStatusRecordedVote
     {
         public string FullActionName { get; set; }
         public DateTime? Date { get; set; }
@@ -118,7 +120,7 @@ namespace CongressCollector.Models.Cleaned
         public string SessionNumber { get; set; }
     }
 
-    public class Committee
+    public class BillStatusCommittee
     {
         public string Chamber { get; set; }
         public string Name { get; set; }
@@ -155,7 +157,7 @@ namespace CongressCollector.Models.Cleaned
         public string Citation { get; set; }
     }
 
-    public class BillSponsor
+    public class BillStatusSponsor
     {
         public string FullName { get; set; }
         public string ByRequestType { get; set; }
@@ -176,7 +178,7 @@ namespace CongressCollector.Models.Cleaned
         public string BioguideId { get; set; }
     }
 
-    public class BillSubject
+    public class BillStatusSubject
     {
         public IReadOnlyCollection<LegislativeSubject> LegislativeSubjects { get; set; }
         public PolicyArea PolicyArea { get; set; }
@@ -192,7 +194,7 @@ namespace CongressCollector.Models.Cleaned
         public string Name { get; set; }
     }
 
-    public class BillAction
+    public class BillStatusAction
     {
         public SourceSystem SourceSystem { get; set; }
         public BillActionCommittee Committee { get; set; }
@@ -221,13 +223,13 @@ namespace CongressCollector.Models.Cleaned
         public string Code { get; set; }
     }
 
-    public class BillAmendment
+    public class BillStatusAmendment
     {
         public string Description { get; set; }
-        public BillAmendmentAction LatestAction { get; set; }
+        public LatestAction LatestAction { get; set; }
         public string Congress { get; set; }
         public string Number { get; set; }
-        public IReadOnlyCollection<BillTitle> Titles { get; set; }
+        public IReadOnlyCollection<BillStatusTitle> Titles { get; set; }
         public BillAmendmentCosponsor Cosponsors { get; set; }
         public IReadOnlyCollection<BillAmendmentSponsor> Sponsors { get; set; }
         public string Purpose { get; set; }
@@ -236,7 +238,7 @@ namespace CongressCollector.Models.Cleaned
         public DateTime? UpdateDate { get; set; }
         public DateTime? SubmittedDate { get; set; }
         public string AmendmentType { get; set; } // TODO: enum?
-        public IReadOnlyCollection<BillNote> Notes { get; set; }
+        public IReadOnlyCollection<BillStatusNote> Notes { get; set; }
         public DateTime? ProposedDate { get; set; }
         public IReadOnlyCollection<BillAmendmentAction> Actions { get; set; }
         public AmendedAmendment AmendedAmendment { get; set; }
@@ -253,18 +255,18 @@ namespace CongressCollector.Models.Cleaned
         public string Description { get; set; }
     }
 
-    public class BillLaw
+    public class BillStatusLaw
     {
         public string Number { get; set; }
         public string Type { get; set; }
     }
 
-    public class CommitteeReport
+    public class BillStatusCommitteeReport
     {
         public string Citation { get; set; }
     }
 
-    public class CBOCostEstimate
+    public class BillStatusCBOCostEstimate
     {
         public DateTime? PublishedDate { get; set; }
         public Uri URL { get; set; }
