@@ -1,3 +1,4 @@
+use usgov;
 db.bills.createIndex(
     { CreateDate: 1 },
     { name: "idx_CreateDate" }

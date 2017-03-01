@@ -1,3 +1,4 @@
+use usgov;
 db.bills.find().forEach(function(doc) {
     
     doc.CreateDate = new ISODate(doc.CreateDate);
