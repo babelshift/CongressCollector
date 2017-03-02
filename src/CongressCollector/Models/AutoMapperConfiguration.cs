@@ -94,14 +94,7 @@ namespace CongressCollector.Models
 
                     // Bill summaries have HTML tags in the Text. We should get rid of this so that it doesn't conflict with downstream displays.
                     x.CreateMap<Original.BillSummaries, IReadOnlyCollection<Cleaned.BillStatusSummary>>()
-                    .AfterMap((src, dest) =>
-                    {
-                        foreach(var item in dest)
-                        {
-                            item.Text = ParseHelpers.ParseAndStripHTML(item.Text);
-                        }
-                    })
-                    .ConvertUsing<ItemizedTypeConverter<Original.BillSummaries, Cleaned.BillStatusSummary, Original.Item>>();
+                        .ConvertUsing<ItemizedTypeConverter<Original.BillSummaries, Cleaned.BillStatusSummary, Original.Item>>();
 
                     x.CreateMap<Original.Notes, IReadOnlyCollection<Cleaned.BillStatusNote>>()
                         .ConvertUsing<ItemizedTypeConverter<Original.Notes, Cleaned.BillStatusNote, Original.Item>>();
@@ -149,7 +142,9 @@ namespace CongressCollector.Models
                         .ForMember(dest => dest.LastSummaryUpdateDate,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.LastSummaryUpdateDate)))
                         .ForMember(dest => dest.ActionDescription,
-                        opts => opts.MapFrom(src => src.ActionDesc));
+                        opts => opts.MapFrom(src => src.ActionDesc))
+                        .ForMember(dest => dest.Text,
+                        opts => opts.MapFrom(src => ParseHelpers.ParseAndStripHTML(src.Text)));
 
                     x.CreateMap<Original.Item, Cleaned.BillStatusCosponsor>()
                         .ForMember(dest => dest.IsOriginalCosponsor,
