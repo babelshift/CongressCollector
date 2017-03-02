@@ -17,6 +17,24 @@ namespace CongressCollector.Models.Utilities
         }
 
         /// <summary>
+        /// Returns a nullable int parsed from the input value.
+        /// </summary>
+        /// <param name="rawValue"></param>
+        /// <returns></returns>
+        public static int? ParseNullableInt(string rawValue)
+        {
+            if (String.IsNullOrWhiteSpace(rawValue)) { return null; }
+
+            int value;
+            if (int.TryParse(rawValue, out value))
+            {
+                return value;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Returns a nullable boolean parsed from the input value.
         /// </summary>
         /// <param name="rawValue"></param>

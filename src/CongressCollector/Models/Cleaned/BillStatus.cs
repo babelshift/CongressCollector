@@ -97,7 +97,7 @@ namespace CongressCollector.Models.Cleaned
     public class BillStatusCosponsor
     {
         public string Party { get; set; }
-        public string District { get; set; }
+        public int? District { get; set; }
         public string MiddleName { get; set; }
         public string BioGuideId { get; set; }
         public DateTime? SponsorshipDate { get; set; }
@@ -167,7 +167,7 @@ namespace CongressCollector.Models.Cleaned
         public string BioguideId { get; set; }
         public Identifiers Identifiers { get; set; }
         public string MiddleName { get; set; }
-        public string District { get; set; }
+        public int? District { get; set; }
         public string State { get; set; }
         public string FirstName { get; set; }
     }

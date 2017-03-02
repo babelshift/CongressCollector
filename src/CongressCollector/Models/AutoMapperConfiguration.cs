@@ -152,7 +152,9 @@ namespace CongressCollector.Models
                         .ForMember(dest => dest.SponsorshipDate,
                         opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.SponsorshipDate)))
                         .ForMember(dest => dest.SponsorshipWithdrawnDate,
-                        opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.SponsorshipWithdrawnDate)));
+                        opts => opts.MapFrom(src => ParseHelpers.ParseNullableDateTime(src.SponsorshipWithdrawnDate)))
+                        .ForMember(dest => dest.District,
+                        opts => opts.MapFrom(src => ParseHelpers.ParseNullableInt(src.District)));
 
                     x.CreateMap<Original.Item, Cleaned.BillAmendmentAction>()
                         .ForMember(dest => dest.ActionDate,
@@ -178,7 +180,9 @@ namespace CongressCollector.Models
 
                     x.CreateMap<Original.Item, Cleaned.BillStatusLaw>();
 
-                    x.CreateMap<Original.Item, Cleaned.BillStatusSponsor>();
+                    x.CreateMap<Original.Item, Cleaned.BillStatusSponsor>()
+                        .ForMember(dest => dest.District,
+                        opts => opts.MapFrom(src => ParseHelpers.ParseNullableInt(src.District)));
 
                     x.CreateMap<Original.Item, Cleaned.BillStatusTitle>();
 
