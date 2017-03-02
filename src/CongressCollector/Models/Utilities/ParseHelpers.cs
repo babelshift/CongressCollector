@@ -93,6 +93,13 @@ namespace CongressCollector.Models.Utilities
             return null;
         }
 
+        /// <summary>
+        /// Removes HTML tags and extra spacing from a string. Caution: this only works under
+        /// simple scenarios as it utilizes Regex to perform the stripping tasks. Regex is not
+        /// optimal or even suggested for parsing HTML.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string ParseAndStripHTML(string text)
         {
             if (String.IsNullOrWhiteSpace(text)) { return String.Empty; }

@@ -61,15 +61,7 @@ namespace CongressCollector.Models
                         .ConvertUsing<ItemizedTypeConverter<Original.Actions, Cleaned.BillStatusAction, Original.Item>>();
 
                     x.CreateMap<Original.Actions, IReadOnlyCollection<Cleaned.BillAmendmentAction>>()
-                        .ConvertUsing(src =>
-                        {
-                            if (src.InnerActions == null)
-                            {
-                                return null;
-                            }
-
-                            return mapper.Map<Original.Actions, IReadOnlyCollection<Cleaned.BillAmendmentAction>>(src.InnerActions);
-                        });
+                        .ConvertUsing<ItemizedTypeConverter<Original.Actions, Cleaned.BillAmendmentAction, Original.Item>>();
 
                     x.CreateMap<Original.Links, IReadOnlyCollection<Cleaned.Link>>()
                         .ConvertUsing<ItemizedTypeConverter<Original.Links, Cleaned.Link, Original.Link>>();
@@ -207,6 +199,8 @@ namespace CongressCollector.Models
                         opts => opts.MapFrom(src => new Uri(src.Url)));
 
                     x.CreateMap<Original.Amendment, Cleaned.BillStatusAmendment>()
+                        .ForMember(dest => dest.Actions,
+                        opts => opts.MapFrom(src => src.Actions != null ? src.Actions.InnerActions : null))
                         .ForMember(dest => dest.Congress,
                         opts => opts.MapFrom(src => ParseHelpers.GetFirstStringOrEmpty(src.Congress)))
                         .ForMember(dest => dest.CreateDate,
