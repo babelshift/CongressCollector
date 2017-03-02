@@ -5,6 +5,7 @@ namespace CongressCollector.Models.Cleaned
 {
     public class BillStatus
     {
+        public string BillId { get { return String.Format("{0}{1}-{2}", Type, Number, Congress); } }
         public string Number { get; set; }
         public string Congress { get; set; }
         public string Title { get; set; }
@@ -225,25 +226,26 @@ namespace CongressCollector.Models.Cleaned
 
     public class BillStatusAmendment
     {
-        public string Description { get; set; }
-        public LatestAction LatestAction { get; set; }
-        public string Congress { get; set; }
+        public string AmendmentId { get { return String.Format("{0}{1}-{2}", Type, Number, Congress); } }
         public string Number { get; set; }
-        public IReadOnlyCollection<BillStatusTitle> Titles { get; set; }
-        public BillAmendmentCosponsor Cosponsors { get; set; }
-        public IReadOnlyCollection<BillAmendmentSponsor> Sponsors { get; set; }
+        public string Congress { get; set; }
+        public string Description { get; set; }
         public string Purpose { get; set; }
         public string Chamber { get; set; }
+        public string Type { get; set; }
         public DateTime? CreateDate { get; set; }
         public DateTime? UpdateDate { get; set; }
         public DateTime? SubmittedDate { get; set; }
-        public string AmendmentType { get; set; } // TODO: enum?
-        public IReadOnlyCollection<BillStatusNote> Notes { get; set; }
         public DateTime? ProposedDate { get; set; }
-        public IReadOnlyCollection<BillAmendmentAction> Actions { get; set; }
+        public LatestAction LatestAction { get; set; }
         public AmendedAmendment AmendedAmendment { get; set; }
-        public IReadOnlyCollection<Link> Links { get; set; }
         public AmendedBill AmendedBill { get; set; }
+        public BillAmendmentCosponsor Cosponsors { get; set; }
+        public IReadOnlyCollection<BillStatusTitle> Titles { get; set; }
+        public IReadOnlyCollection<BillAmendmentSponsor> Sponsors { get; set; }
+        public IReadOnlyCollection<BillStatusNote> Notes { get; set; }
+        public IReadOnlyCollection<BillAmendmentAction> Actions { get; set; }
+        public IReadOnlyCollection<Link> Links { get; set; }
     }
 
     public class AmendedAmendment
@@ -303,6 +305,7 @@ namespace CongressCollector.Models.Cleaned
 
     public class AmendedBill
     {
+        public string AmendmentId { get { return String.Format("{0}{1}-{2}", Type, Number, Congress); } }
         public string Congress { get; set; }
         public string Number { get; set; }
         public string OriginChamber { get; set; }

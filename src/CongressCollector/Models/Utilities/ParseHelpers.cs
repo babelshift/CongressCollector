@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace CongressCollector.Models.Utilities
 {
@@ -75,6 +76,16 @@ namespace CongressCollector.Models.Utilities
             }
 
             return null;
+        }
+
+        public static string ParseAndStripHTML(string text)
+        {
+            String cleaned = text;
+
+            cleaned = Regex.Replace(cleaned, @"<[^>]+>|&nbsp;", "").Trim();
+            cleaned = Regex.Replace(cleaned, @"\s{2,}", " ");
+
+            return cleaned;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace CongressCollector.Models.Converters
             bill.Number = source.BillNumber;
             bill.Congress = source.Congress;
             bill.Title = source.Title;
-            bill.ConstitutionalAuthorityStatement = source.ConstitutionalAuthorityStatementText;
+            bill.ConstitutionalAuthorityStatement = ParseHelpers.ParseAndStripHTML(source.ConstitutionalAuthorityStatementText);
             bill.Type = source.BillType;
             bill.OriginChamber = source.OriginChamber;
             bill.UpdateDate = ParseHelpers.ParseNullableDateTime(source.UpdateDate);
