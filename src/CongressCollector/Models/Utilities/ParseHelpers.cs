@@ -82,10 +82,7 @@ namespace CongressCollector.Models.Utilities
         /// <returns></returns>
         public static DateTime? ParseNullableDateTime(string dateTime)
         {
-            if (String.IsNullOrWhiteSpace(dateTime))
-            {
-                return null;
-            }
+            if (String.IsNullOrWhiteSpace(dateTime)) { return null; }
 
             DateTime updateDate;
             if (DateTime.TryParse(dateTime, out updateDate))
@@ -98,6 +95,8 @@ namespace CongressCollector.Models.Utilities
 
         public static string ParseAndStripHTML(string text)
         {
+            if (String.IsNullOrWhiteSpace(text)) { return String.Empty; }
+
             String cleaned = text;
 
             cleaned = Regex.Replace(cleaned, @"<[^>]+>|&nbsp;", "").Trim();
