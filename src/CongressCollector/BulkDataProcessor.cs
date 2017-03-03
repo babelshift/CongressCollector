@@ -120,7 +120,7 @@ namespace CongressCollector
                     Directory.CreateDirectory(outputPathWithBillType);
                     Logger.LogInformation("Created directory: {0}", outputPathWithBillType);
                 }
-                
+
                 Logger.LogInformation("Downloading file at: {0}", bulkDataZipUrl);
                 using (var zipStream = await httpClient.GetStreamAsync(bulkDataZipUrl.ToString()))
                 {
@@ -130,6 +130,7 @@ namespace CongressCollector
                         {
                             Logger.LogInformation("Processing file: {0}", entry.Name);
                             // Open the currently processing file, read into memory, write to XML and JSON
+                            //using (Stream entryStream = File.OpenRead("F:\\Programming\\src-current\\GitHub\\CongressCollector\\src\\CongressCollector\\bin\\Debug\\netcoreapp1.1\\BILLSTATUS\\114\\hr\\BILLSTATUS-114hr10.xml"))
                             using (Stream entryStream = entry.Open())
                             {
                                 using (MemoryStream entryMemoryStream = new MemoryStream())
@@ -154,24 +155,42 @@ namespace CongressCollector
         /// <param name="outputPathWithBillType"></param>
         /// <param name="zipArchiveEntryName"></param>
         /// <param name="entryMemoryStreamBytes"></param>
-        private static void WriteJsonFile(string outputPathWithBillType, string zipArchiveEntryName, byte[] entryMemoryStreamBytes)
+        private void WriteJsonFile(string outputPathWithBillType, string zipArchiveEntryName, byte[] entryMemoryStreamBytes)
         {
             if (String.IsNullOrWhiteSpace(zipArchiveEntryName) || entryMemoryStreamBytes == null || entryMemoryStreamBytes.Length == 0)
             {
                 return;
             }
 
-            // Deserialize the XML to objects
-            var originalObjects = XmlHelper.DeserializeXML<Models.Original.BillStatus>(entryMemoryStreamBytes);
+            string cleanedJson = String.Empty;
 
-            // Clean the objects by mapping to a sane structure with proper data types and serialize to JSON
-            var cleanedObjects = AutoMapperConfiguration.Mapper.Map<Models.Original.Bill, Models.Cleaned.BillStatus>(originalObjects.Bill);
-            string cleanedJson = JsonConvert.SerializeObject(cleanedObjects);
+            // If the request was for BILLSTATUS, we need to deserialize to the correct objects
+            if (bulkDataCollectionName == "BILLSTATUS")
+            {
+                // Deserialize the XML to disgusting objects
+                var originalObjects = XmlHelper.DeserializeXML<Models.Original.BillStatus>(entryMemoryStreamBytes);
 
-            // Write out the cleaned JSON contents to a file
-            string jsonFileName = Path.GetFileNameWithoutExtension(zipArchiveEntryName) + ".json";
-            string outputJsonPath = Path.Combine(outputPathWithBillType, jsonFileName);
-            File.WriteAllText(outputJsonPath, cleanedJson);
+                // Clean the objects by mapping to a sane structure with proper data types and serialize to JSON
+                var cleanedObjects = AutoMapperConfiguration.Mapper.Map<Models.Original.Bill, Models.Cleaned.BillStatus>(originalObjects.Bill);
+                cleanedJson = JsonConvert.SerializeObject(cleanedObjects);
+            }
+            // BILLS collection is just raw XML text to save
+            else if (bulkDataCollectionName == "BILLS")
+            {
+                Models.Cleaned.BillText billText = new Models.Cleaned.BillText()
+                {
+                    Text = System.Text.Encoding.UTF8.GetString(entryMemoryStreamBytes)
+                };
+                cleanedJson = JsonConvert.SerializeObject(billText);
+            }
+
+            // If we have something to write out, do so to a file
+            if (!String.IsNullOrWhiteSpace(cleanedJson))
+            {
+                string jsonFileName = Path.GetFileNameWithoutExtension(zipArchiveEntryName) + ".json";
+                string outputJsonPath = Path.Combine(outputPathWithBillType, jsonFileName);
+                File.WriteAllText(outputJsonPath, cleanedJson);
+            }
         }
 
         /// <summary>

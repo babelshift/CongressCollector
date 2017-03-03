@@ -57,8 +57,9 @@ namespace CongressCollector
 
         private SupportedArgumentChecker()
         {
-            collections.Add(new SupportedArgument<string>("billstatus", "Detailed bill or resolution metadata"));
-            collections.Add(new SupportedArgument<string>("billsum", "Text summaries of bills, resolutions, or other documents associated with measures such as amendments, reports, or public laws"));
+            collections.Add(new SupportedArgument<string>("billstatus", "Detailed bill or resolution metadata."));
+            collections.Add(new SupportedArgument<string>("bills", "Bill text as transcribed by the Library of Congress in XML format."));
+            collections.Add(new SupportedArgument<string>("billsum", "Text summaries of bills, resolutions, or other documents associated with measures such as amendments, reports, or public laws."));
 
             measures.Add(new SupportedArgument<string>("hconres", "House Concurrent Resolution"));
             measures.Add(new SupportedArgument<string>("hjres", "House Joint Resolution"));

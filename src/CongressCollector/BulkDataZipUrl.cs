@@ -42,7 +42,18 @@ namespace CongressCollector
         /// </summary>
         public override string ToString()
         {
-            return String.Format("{0}/{1}/{2}/{3}-{1}-{2}.zip", bulkDataZipBaseUrl, Congress, Measure, bulkDataCollectionName);
+            string url = String.Empty;
+
+            if (bulkDataCollectionName == "BILLS")
+            {
+                url = String.Format("{0}/{1}/1/{2}/{3}-{1}-1-{2}.zip", bulkDataZipBaseUrl, Congress, Measure, bulkDataCollectionName);
+            }
+            else
+            {
+                url = String.Format("{0}/{1}/{2}/{3}-{1}-{2}.zip", bulkDataZipBaseUrl, Congress, Measure, bulkDataCollectionName);
+            }
+
+            return url;
         }
     }
 }
