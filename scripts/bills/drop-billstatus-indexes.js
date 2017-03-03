@@ -1,4 +1,4 @@
 use usgov;
-db.bills.dropIndex( "idx_CreateDate" );
-db.bills.dropIndex( "idx_UpdateDate" );
-db.bills.dropIndex( "idx_Congress" );
+db.billstatuses.dropIndex( "idx_CreateDate" );
+db.billstatuses.dropIndex( "idx_UpdateDate" );
+db.billstatuses.dropIndex( "idx_Congress" );

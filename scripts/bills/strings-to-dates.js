@@ -1,5 +1,5 @@
 use usgov;
-db.bills.find().forEach(function(doc) {
+db.billstatuses.find().forEach(function(doc) {
     
     doc.CreateDate = new ISODate(doc.CreateDate);
 
@@ -31,5 +31,5 @@ db.bills.find().forEach(function(doc) {
         summary.UpdateDate = new ISODate(summary.UpdateDate);
     });
 
-    db.bills.save(doc);
+    db.billstatuses.save(doc);
 });

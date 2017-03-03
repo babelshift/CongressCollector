@@ -1,15 +1,15 @@
 use usgov;
-db.bills.createIndex(
+db.billstatuses.createIndex(
     { CreateDate: 1 },
     { name: "idx_CreateDate" }
 );
 
-db.bills.createIndex(
+db.billstatuses.createIndex(
     { UpdateDate: 1 },
     { name: "idx_UpdateDate" }
 );
 
-db.bills.createIndex(
+db.billstatuses.createIndex(
     { Congress: 1 },
     { name: "idx_Congress" }
 );
