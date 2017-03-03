@@ -2,12 +2,14 @@
 
 # create the output directory (if it does not exist)
 mkdir -p output
+
 # remove result from previous runs
-rm output/*.json
+rm output/billstext.json
+
 # add first opening bracked
 echo [ >> output/tmp.json
 # use all json files in current folder
-for i in BILLSTATUS/*/*/*.json
+for i in bin/BILLS/*/*/*.json
 do 
     # dump the file's content
     cat "$i" >> output/tmp.json
@@ -15,8 +17,8 @@ do
     echo , >>  output/tmp.json
 done
 # remove the last comma from the file; otherwise it's not valid json
-cat output/tmp.json | sed '$ s/.$//' >> output/out.json
+cat output/tmp.json | sed '$ s/.$//' >> output/billstext.json
 # remove tempfile
 rm output/tmp.json
 # add closing bracket
-echo ] >> output/out.json
+echo ] >> output/billstext.json

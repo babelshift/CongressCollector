@@ -1,7 +1,7 @@
 use usgov;
 db.createUser({
-	user: "",
-	pwd: "",
+	user: "congress-collector",
+	pwd: "s9p9t84",
 	roles: [ 
 		{ role: "dbAdmin", db: "usgov" },
 		{ role: "readWrite", db: "usgov" }
