@@ -13,3 +13,18 @@ db.billstatuses.createIndex(
     { Congress: 1 },
     { name: "idx_Congress" }
 );
+
+db.billstatuses.createIndex(
+    { IntroducedDate: 1 },
+    { name: "idx_IntroducedDate" }
+);
+
+db.committees.createIndex(
+    { "thomas_id": 1 },
+    { name: "idx_ThomasId" }
+);
+
+db.legislators.createIndex(
+    { "id.bioguide": 1 },
+    { name: "idx_BioguideId" }
+);
