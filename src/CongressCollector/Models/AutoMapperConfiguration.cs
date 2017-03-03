@@ -61,7 +61,7 @@ namespace CongressCollector.Models
                         .ConvertUsing<ItemizedTypeConverter<Original.Actions, Cleaned.BillStatusAction, Original.Item>>();
 
                     x.CreateMap<Original.Actions, IReadOnlyCollection<Cleaned.BillAmendmentAction>>()
-                        .ConvertUsing<ItemizedTypeConverter<Original.Actions, Cleaned.BillAmendmentAction, Original.Item>>();
+                        .ConvertUsing<BillAmendmentActionsTypeConverter>();
 
                     x.CreateMap<Original.Links, IReadOnlyCollection<Cleaned.Link>>()
                         .ConvertUsing<ItemizedTypeConverter<Original.Links, Cleaned.Link, Original.Link>>();
@@ -84,7 +84,6 @@ namespace CongressCollector.Models
                     x.CreateMap<Original.BillCommittees, IReadOnlyCollection<Cleaned.BillStatusCommittee>>()
                         .ConvertUsing<ItemizedTypeConverter<Original.BillCommittees, Cleaned.BillStatusCommittee, Original.Item>>();
 
-                    // Bill summaries have HTML tags in the Text. We should get rid of this so that it doesn't conflict with downstream displays.
                     x.CreateMap<Original.BillSummaries, IReadOnlyCollection<Cleaned.BillStatusSummary>>()
                         .ConvertUsing<ItemizedTypeConverter<Original.BillSummaries, Cleaned.BillStatusSummary, Original.Item>>();
 
