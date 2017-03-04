@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CongressCollector
@@ -162,6 +163,7 @@ namespace CongressCollector
                 return;
             }
 
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(zipArchiveEntryName);
             string cleanedJson = String.Empty;
 
             // If the request was for BILLSTATUS, we need to deserialize to the correct objects
@@ -177,20 +179,50 @@ namespace CongressCollector
             // BILLS collection is just raw XML text to save
             else if (bulkDataCollectionName == "BILLS")
             {
+                string billId = GetBillIdFromZipFileName(fileNameWithoutExtension);
+
                 Models.Cleaned.BillText billText = new Models.Cleaned.BillText()
                 {
-                    Text = System.Text.Encoding.UTF8.GetString(entryMemoryStreamBytes)
+                    BillId = billId,
+                    PackageId = fileNameWithoutExtension,
+                    Text = Encoding.UTF8.GetString(entryMemoryStreamBytes)
                 };
+
                 cleanedJson = JsonConvert.SerializeObject(billText);
             }
 
             // If we have something to write out, do so to a file
             if (!String.IsNullOrWhiteSpace(cleanedJson))
             {
-                string jsonFileName = Path.GetFileNameWithoutExtension(zipArchiveEntryName) + ".json";
+                string jsonFileName = fileNameWithoutExtension + ".json";
                 string outputJsonPath = Path.Combine(outputPathWithBillType, jsonFileName);
                 File.WriteAllText(outputJsonPath, cleanedJson);
             }
+        }
+
+        /// <summary>
+        /// Returns a Bill ID formatted from the Bill Text file name by parsing out Congress #, Bill Type, and Bill Number.
+        /// </summary>
+        /// <param name="billTextFileName">Bill Text file name in a format like "BILLS-113hconres10ih" from the GPO FDsys system.</param>
+        /// <returns>Bill ID in a format like "HR30-113".</returns>
+        private static string GetBillIdFromZipFileName(string billTextFileName)
+        {
+            string regex = "([0-9]{1,3})(hr|hres|hjres|hconres|s|sres|sjres|sconres)([0-9]{1,4})";
+            int congress = 0;
+            string billType = String.Empty;
+            int billNumber = 0;
+            Match mc = Regex.Match(billTextFileName, regex);
+            if (mc != null && mc.Groups != null && mc.Groups.Count > 2)
+            {
+                int.TryParse(mc.Groups[1].Value, out congress);
+                billType = mc.Groups[2].Value;
+                int.TryParse(mc.Groups[3].Value, out billNumber);
+            }
+            else
+            {
+                billType = "UNKNOWN";
+            }
+            return String.Format("{0}{1}-{2}", billType.ToUpper(), billNumber, congress);
         }
 
         /// <summary>

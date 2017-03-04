@@ -2,7 +2,7 @@
   "profiles": {
     "CongressCollector": {
       "commandName": "Project",
-      "commandLineArgs": "collect bills -c 114 -m hr"
+      "commandLineArgs": "collect bills -c 114 -m hres"
     }
   }
 }
